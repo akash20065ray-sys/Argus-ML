@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArgusML — Universal AI Observability & Root-Cause Platform</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300f2fe'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+</head>
+<body>
+
+  <!-- Top Application Header -->
+  <header class="app-header">
+    <div class="brand-container">
+      <div class="brand-logo-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">ArgusML</div>
+        <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: -2px;">
+          Universal Production AI Observability &amp; Graph Diagnostics
+        </div>
+      </div>
+      <span class="brand-badge">UNIVERSAL MLOps</span>
+    </div>
+
+    <div class="header-status-strip">
+      <!-- Universal Model Selector Dropdown -->
+      <div class="model-select-wrapper">
+        <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">ACTIVE MODEL:</span>
+        <select id="model-select" class="model-dropdown">
+          <!-- Dynamically populated from /api/models -->
+        </select>
+      </div>
+
+      <!-- Register Any Model Button -->
+      <button id="btn-open-register" class="btn-primary-action">
+        <span>➕</span> Register Any Model / CSV
+      </button>
+
+      <div class="status-pill">
+        <div id="system-status-dot" class="pulse-dot"></div>
+        <span id="system-status-text" style="color: var(--accent-emerald);">SYSTEM OPERATIONAL</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Chaos & Drift Simulation Controller -->
+  <section class="control-strip">
+    <div class="control-label-group">
+      <span style="font-size: 1.1rem;">⚡</span>
+      <span class="control-label">Live Drift &amp; Chaos Injector:</span>
+      <span id="active-model-type-tag" class="dsa-badge" style="color: var(--accent-cyan);">CLASSIFICATION</span>
+    </div>
+
+    <!-- Dynamic Drift Controls (Populated dynamically per active model's features) -->
+    <div id="dynamic-btn-group" class="btn-group">
+      <button id="btn-mode-normal" class="sim-btn active" onclick="setNormalTraffic()">
+        <span>🟢</span> Normal Traffic
+      </button>
+
+      <!-- Feature drift buttons injected here by app.js -->
+      <div id="feature-drift-buttons" style="display: flex; gap: 8px;"></div>
+
+      <button id="btn-mode-latency" class="sim-btn" onclick="toggleLatencySpike()">
+        <span>⏱️</span> Spike Latency
+      </button>
+
+      <button id="btn-reset" class="sim-btn reset-btn" onclick="resetTelemetry()">
+        <span>🔄</span> Reset Baseline
+      </button>
+    </div>
+  </section>
+
+  <!-- Main Dashboard Container -->
+  <main class="dashboard-container">
+
+    <!-- Empty State / Clean Workspace Hero (Displays when no model is loaded yet) -->
+    <section id="empty-state-hero" class="glass-panel" style="text-align: center; padding: 48px 32px; border: 1px dashed rgba(0, 242, 254, 0.4); margin-bottom: 8px; display: none;">
+      <div style="font-size: 2.8rem; margin-bottom: 12px;">🛡️</div>
+      <h2 style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; margin-bottom: 8px;">
+        AI Observability Engine Ready
+      </h2>
+      <p style="color: var(--text-muted); max-width: 650px; margin: 0 auto 24px; font-size: 0.95rem; line-height: 1.6;">
+        No ML model is currently active. Connect your own production model or upload a baseline CSV dataset to begin real-time drift telemetry, dynamic DAG dependency tracing, and Max-Heap alert ranking.
+      </p>
+      <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
+        <button onclick="document.getElementById('register-modal-backdrop').classList.add('open')" class="btn-primary-action" style="padding: 10px 22px; font-size: 0.9rem;">
+          <span>➕</span> Register Your ML Model / CSV
+        </button>
+        <button id="btn-load-demo-showcase" class="sim-btn" style="padding: 10px 20px; font-size: 0.9rem;">
+          <span>📦</span> Load Optional Demo Showcase
+        </button>
+      </div>
+    </section>
+
+    <!-- KPI Metric Cards -->
+    <section id="metrics-section" class="metrics-row">
+      <!-- Rolling Performance Card -->
+      <div id="card-accuracy" class="metric-card">
+        <div class="metric-header">
+          <span id="metric-perf-title" class="metric-title">Rolling Accuracy</span>
+          <span class="dsa-badge">DSA: Deque (O(1))</span>
+        </div>
+        <div class="metric-value-row">
+          <span id="val-accuracy" class="metric-big-val">95.2%</span>
+          <span id="delta-accuracy" class="metric-delta delta-good">● Within SLA</span>
+        </div>
+        <div class="metric-subtitle">Sliding window over last 400 inferences</div>
+      </div>
+
+      <!-- P99 Latency Card -->
+      <div id="card-latency" class="metric-card">
+        <div class="metric-header">
+          <span class="metric-title">P99 Inference Latency</span>
+          <span class="dsa-badge">Rolling Window</span>
+        </div>
+        <div class="metric-value-row">
+          <span id="val-latency" class="metric-big-val">48.2 ms</span>
+          <span id="delta-latency" class="metric-delta delta-good">● Optimal (&lt; 200ms)</span>
+        </div>
+        <div class="metric-subtitle">End-to-end inference and feature store time</div>
+      </div>
+
+      <!-- Statistical Drift Status Card -->
+      <div id="card-drift" class="metric-card">
+        <div class="metric-header">
+          <span class="metric-title">Statistical Feature Drift</span>
+          <span class="dsa-badge">KS-Test &amp; PSI</span>
+        </div>
+        <div class="metric-value-row">
+          <span id="val-drift" class="metric-big-val" style="color: var(--accent-emerald);">Zero Drift</span>
+          <span id="delta-drift" class="metric-delta delta-good">🟢 Distribution Stable</span>
+        </div>
+        <div class="metric-subtitle">Continuous 2-sample KS &amp; Population Stability Index</div>
+      </div>
+
+      <!-- Ingestion Queue Card -->
+      <div id="card-queue" class="metric-card">
+        <div class="metric-header">
+          <span class="metric-title">Ingestion Queue Buffer</span>
+          <span class="dsa-badge">DSA: FIFO Queue</span>
+        </div>
+        <div class="metric-value-row">
+          <span id="val-queue" class="metric-big-val">8 / 5000</span>
+        </div>
+        <div id="delta-queue" class="metric-subtitle" style="font-family: var(--font-mono);">
+          Drops: 0 | Total Processed: 0
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Section: Topology DAG & Priority Alerts -->
+    <section class="main-grid">
+
+      <!-- Left Column: Dependency DAG -->
+      <div class="glass-panel">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <span style="font-size: 1.2rem;">🌐</span>
+            <div>
+              <h2 class="panel-title">Dynamic Dependency Topology</h2>
+              <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 2px;">
+                DAG: Upstream Ingestion &rarr; Model Features &rarr; Active Model &rarr; Downstream Services
+              </div>
+            </div>
+          </div>
+          <span class="dsa-badge" style="color: var(--accent-cyan); border-color: rgba(0, 242, 254, 0.3);">
+            DSA: Directed Graph (DAG)
+          </span>
+        </div>
+
+        <div class="graph-viewport">
+          <canvas id="graph-canvas"></canvas>
+        </div>
+
+        <div class="graph-legend">
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--accent-emerald);"></div>
+            <span>Healthy Node</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--accent-amber);"></div>
+            <span>Moderate Drift (Warning)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--accent-crimson);"></div>
+            <span>Critical Degradation (Pulsing Red)</span>
+          </div>
+          <div class="legend-item" style="margin-left: auto; font-family: var(--font-mono);">
+            <span>Reverse BFS: Root Cause &bull; Forward BFS: Blast Radius</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Alert Prioritization Center (Max-Heap) -->
+      <div class="glass-panel">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <span style="font-size: 1.2rem;">🚨</span>
+            <div>
+              <h2 class="panel-title">Priority Incident Queue</h2>
+              <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 2px;">
+                Ranked dynamically by severity score
+              </div>
+            </div>
+          </div>
+          <span id="active-alert-count" class="alert-badge badge-healthy">
+            0 Prioritized
+          </span>
+        </div>
+
+        <div id="alerts-list-container" class="alerts-list">
+          <!-- Dynamically populated from Max-Heap -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Bottom Section: Feature Drift Telemetry Table -->
+    <section class="glass-panel">
+      <div class="panel-header">
+        <div class="panel-title-group">
+          <span style="font-size: 1.2rem;">📊</span>
+          <div>
+            <h2 class="panel-title">Feature Drift &amp; Covariate Shift Telemetry</h2>
+            <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 2px;">
+              Live statistical comparison against model's baseline distributions
+            </div>
+          </div>
+        </div>
+        <span class="dsa-badge">DSA: HashMap Baselines (O(1))</span>
+      </div>
+
+      <div class="drift-table-wrapper">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>Feature Name</th>
+              <th>Health Status</th>
+              <th>KS Statistic (D)</th>
+              <th>KS p-Value (&alpha; = 0.05)</th>
+              <th>PSI Score</th>
+              <th>Mean Shift (%)</th>
+              <th>Window Sample Size</th>
+            </tr>
+          </thead>
+          <tbody id="drift-table-body">
+            <!-- Dynamically populated from DriftEngine -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- DSA Mapping Callout Section -->
+    <section class="glass-panel" style="background: rgba(15, 20, 34, 0.4);">
+      <div class="panel-header" style="margin-bottom: 12px;">
+        <h3 style="font-size: 1rem; font-family: var(--font-display); color: var(--accent-cyan);">
+          🧬 ArgusML Architectural Data Structures &amp; Complexity Mapping
+        </h3>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; font-size: 0.82rem;">
+        <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent-blue);">
+          <strong style="color: #fff;">1. EventQueue (FIFO Queue)</strong>: Universal ingestion decoupling buffer. Enqueue: <code style="color: var(--accent-cyan);">O(1)</code>, Dequeue: <code style="color: var(--accent-cyan);">O(1)</code>.
+        </div>
+        <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent-emerald);">
+          <strong style="color: #fff;">2. MetricWindow (Deque)</strong>: Rolling sliding window of size W. Appends new, evicts oldest in <code style="color: var(--accent-emerald);">O(1)</code> amortized time.
+        </div>
+        <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent-crimson);">
+          <strong style="color: #fff;">3. AlertRanker (Max-Heap)</strong>: Dynamic incident prioritization. Push: <code style="color: var(--accent-crimson);">O(log N)</code>, Pop Max: <code style="color: var(--accent-crimson);">O(log N)</code>.
+        </div>
+        <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent-purple);">
+          <strong style="color: #fff;">4. DependencyTopology (DAG Graph)</strong>: Reverse-BFS Root Cause (<code style="color: var(--accent-purple);">O(V+E)</code>); Forward-BFS Blast Radius (<code style="color: var(--accent-purple);">O(V+E)</code>).
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal 1: Register Any Model / CSV -->
+  <div id="register-modal-backdrop" class="modal-backdrop">
+    <div class="rca-modal" style="border-color: rgba(0, 242, 254, 0.4); box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 35px rgba(0,242,254,0.25);">
+      <button id="register-modal-close" class="close-btn">&times;</button>
+      
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+        <span style="font-size: 1.4rem;">🚀</span>
+        <h2 style="font-family: var(--font-display); font-size: 1.3rem;">Register &amp; Monitor Any ML Model</h2>
+      </div>
+      <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 18px;">
+        Upload any CSV dataset or pick a domain template to build a dedicated DAG and start monitoring.
+      </div>
+
+      <form id="register-model-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Model Identifier (ID)</label>
+            <input type="text" id="reg-model-id" class="form-input" placeholder="e.g. loan_risk_v1" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Model Display Name</label>
+            <input type="text" id="reg-model-name" class="form-input" placeholder="e.g. Loan Default Classifier" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Task Type</label>
+            <select id="reg-model-type" class="form-select">
+              <option value="CLASSIFICATION">Classification (Accuracy, F1)</option>
+              <option value="REGRESSION">Regression (MAE, RMSE)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Target Column Name in CSV</label>
+            <input type="text" id="reg-target-col" class="form-input" placeholder="e.g. default_flag or price" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Upload Baseline Training CSV</label>
+          <input type="file" id="reg-csv-file" class="form-input" accept=".csv" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Downstream Consumer Services (Comma Separated)</label>
+          <input type="text" id="reg-downstream" class="form-input" value="Core Lending API, Risk Review Dashboard, Underwriting Engine">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
+          <button type="button" id="btn-load-sample" class="sim-btn" style="color: var(--accent-cyan); border-color: rgba(0,242,254,0.3);">
+            ✨ Quick Auto-Fill with Diabetes Dataset
+          </button>
+          <button type="submit" class="submit-btn" style="width: auto; padding: 8px 24px;">
+            Initialize &amp; Monitor Model &rarr;
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Root-Cause Analysis (RCA) Diagnostic Modal -->
+  <div id="rca-modal-backdrop" class="modal-backdrop">
+    <div class="rca-modal">
+      <button id="modal-close-btn" class="close-btn">&times;</button>
+      
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+        <span style="font-size: 1.4rem;">🚨</span>
+        <h2 style="font-family: var(--font-display); font-size: 1.3rem;">Automated Root-Cause Diagnosis</h2>
+      </div>
+      <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">
+        Incident Telemetry &amp; Dependency Attribution Report
+      </div>
+
+      <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 16px;">
+        <span id="rca-severity" class="alert-badge badge-critical">CRITICAL</span>
+        <span style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted);">
+          Model ID: <strong id="rca-model-id" style="color: #fff;">customer_churn_v1</strong>
+        </span>
+      </div>
+
+      <!-- Culprit Feature Callout -->
+      <div class="rca-culprit-banner">
+        <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.8px; color: var(--accent-crimson); margin-bottom: 6px;">
+          Primary Root Cause Identified (Reverse Graph BFS)
+        </div>
+        <div style="font-size: 1.15rem; font-family: var(--font-mono); font-weight: 700; color: #fff; margin-bottom: 8px;">
+          Feature: <span id="rca-culprit-feature" style="color: var(--accent-crimson);">monthly_charges</span>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-family: var(--font-mono); font-size: 0.8rem; margin-top: 10px;">
+          <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">
+            <div style="color: var(--text-dim); font-size: 0.7rem;">KS STATISTIC</div>
+            <div id="rca-ks-stat" style="font-weight: 700; color: #fff;">0.485</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">
+            <div style="color: var(--text-dim); font-size: 0.7rem;">PSI SCORE</div>
+            <div id="rca-psi-stat" style="font-weight: 700; color: #fff;">0.392</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">
+            <div style="color: var(--text-dim); font-size: 0.7rem;">DISTRIBUTION SHIFT</div>
+            <div id="rca-shift-pct" style="font-weight: 700; color: #fff;">+320%</div>
+          </div>
+        </div>
+
+        <p id="rca-diagnosis-text" style="font-size: 0.85rem; color: #e2e8f0; margin-top: 12px; line-height: 1.4;"></p>
+      </div>
+
+      <!-- Blast Radius -->
+      <div style="margin-top: 16px;">
+        <div style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">
+          Affected Blast Radius (Forward Graph BFS):
+        </div>
+        <div id="rca-blast-radius-list" class="rca-blast-list">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Remediation Recommendation -->
+      <div style="margin-top: 18px;">
+        <div style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--accent-emerald); margin-bottom: 6px;">
+          Recommended Automated Remediation:
+        </div>
+        <div id="rca-remediation-text" class="remediation-box"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/graph_renderer.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
