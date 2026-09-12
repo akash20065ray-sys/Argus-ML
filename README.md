@@ -11,6 +11,15 @@
 
 ---
 
+### 📂 All-in-One Documentation & Architecture Bundle
+All system architecture diagrams, DSA engineering specifications, and presentation guides are consolidated in the [`docs/`](./docs) folder:
+* 🏛️ **[System Architecture Document](./docs/SYSTEM_ARCHITECTURE.md):** Complete multi-layer design & latency budgets.
+* 🖼️ **[Visual Architecture Diagram (SVG)](./docs/architecture_diagram.svg):** High-resolution system schematic.
+* 🧬 **[DSA Engineering Specifications](./docs/DSA_SPECIFICATION.md):** Big-O mathematical proofs & pseudocode.
+* 🎓 **[Presentation Deck & Viva Guide](./docs/PRESENTATION_AND_VIVA.md):** 10-slide deck & oral defense cheatsheet.
+
+---
+
 ## 📑 Master Table of Contents
 1. [Platform Overview & Core Concept](#-platform-overview--core-concept)
 2. [Unified System Architecture](#-unified-system-architecture)
