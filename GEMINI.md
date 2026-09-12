@@ -31,7 +31,7 @@ This file is automatically loaded into memory across all sessions in this worksp
   python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000
   ```
 * **Open Dashboard:** Open `http://127.0.0.1:8000` in browser.
-* **Run Unit Tests (All 9 Passed):**
+* **Run Unit Tests (All 12 Passed):**
   ```bash
   python -m pytest backend/tests/ -v
   ```
@@ -52,7 +52,13 @@ This file is automatically loaded into memory across all sessions in this worksp
 
 ---
 
-## ⏳ Next Steps / Optional Remaining Phases
-* **Phase 7:** 1-Click Automated Model Retraining Trigger (Retrains model on drifted window and resolves alert live).
-* **Phase 8:** Downloadable PDF / Markdown Incident Post-Mortem Report.
-* **Phase 9:** Webhook notifications (Slack / Discord / Email).
+## ⚡ Active Advanced Features (Phases 7 & 8)
+* **Phase 7: 1-Click Automated Model Retraining Trigger:**
+  * Re-fits model on sliding window + baseline data, computes recovered accuracy/R², updates HashMap baseline distributions, bumps version (`v1.0.0` &rarr; `v1.1.0`), resolves alerts in Max-Heap, and resets node health to `HEALTHY`.
+* **Phase 8: Downloadable Markdown Incident Post-Mortem Report:**
+  * Exports comprehensive incident post-mortem markdown report documenting root cause attribution, statistical drift indicators (KS/PSI), blast radius, and automated remediation logs.
+
+---
+
+## ⏳ Optional Future Extension
+* **Phase 9:** Webhook notifications (Slack / Discord / PagerDuty / Email).

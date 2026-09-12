@@ -59,7 +59,7 @@ class AlertMaxHeap:
     def __init__(self):
         self.heap: List[Alert] = []
         self.index_map: Dict[str, int] = {}  # alert_id -> index in heap for O(1) existence checks
-        self.lock = threading.Lock()
+        self.lock = threading.RLock()
 
     def _parent(self, i: int) -> int:
         return (i - 1) // 2

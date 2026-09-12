@@ -233,6 +233,29 @@ def resolve_alert(alert_id: str):
     return {"success": True, "alert_id": alert_id}
 
 
+@app.post("/api/models/{model_id}/retrain")
+def retrain_model_endpoint(model_id: str):
+    """
+    Phase 7: 1-Click Automated Model Retraining Trigger.
+    Retrains the active model on recent distribution data, updates baselines, and resolves alerts.
+    """
+    try:
+        result = system.retrain_active_model()
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Retraining failed: {str(e)}")
+
+
+@app.get("/api/alerts/{alert_id}/report")
+def get_incident_report(alert_id: str):
+    """
+    Phase 8: Downloadable Markdown Incident Post-Mortem Report.
+    """
+    report_md = system.generate_incident_report(alert_id)
+    return {"alert_id": alert_id, "report_markdown": report_md}
+
+
+
 # Serve static frontend files
 frontend_dir = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "frontend")

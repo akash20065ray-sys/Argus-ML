@@ -404,8 +404,21 @@
         </div>
         <div id="rca-remediation-text" class="remediation-box"></div>
       </div>
+
+      <!-- Actions: Phase 7 (1-Click Retrain) & Phase 8 (Download Post-Mortem Report) -->
+      <div style="margin-top: 22px; display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 16px;">
+        <button type="button" id="btn-rca-download-report" class="sim-btn" style="color: var(--accent-cyan); border-color: rgba(0,242,254,0.3); display: flex; align-items: center; gap: 6px; cursor: pointer;">
+          <span>📄</span> Download Post-Mortem (.md)
+        </button>
+        <button type="button" id="btn-rca-auto-retrain" class="submit-btn" style="background: linear-gradient(135deg, #00f2fe, #4facfe); box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); display: flex; align-items: center; gap: 6px; cursor: pointer; width: auto; padding: 10px 22px;">
+          <span>⚡</span> 1-Click Auto-Retrain &amp; Resolve
+        </button>
+      </div>
     </div>
   </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" style="position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;"></div>
 
   <script src="/static/js/graph_renderer.js"></script>
   <script src="/static/js/app.js"></script>

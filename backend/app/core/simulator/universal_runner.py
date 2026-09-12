@@ -46,6 +46,54 @@ class UniversalModel:
 
         self.model.fit(X, y)
 
+    def retrain_on_data(
+        self,
+        new_data_dict: Dict[str, List[float]],
+        new_target_values: List[float],
+        version_bump: str = "v1.1.0",
+    ) -> Dict[str, Any]:
+        """
+        Retrains the model on updated distribution data (e.g. recent sliding window + baselines).
+        Updates self.model, recalculates training metrics, and returns retraining summary.
+        """
+        combined_data = {}
+        for f in self.features:
+            base_arr = self.data_dict.get(f, [])
+            new_arr = new_data_dict.get(f, [])
+            # Combine, keeping recent samples
+            combined = list(base_arr) + list(new_arr)
+            combined_data[f] = combined
+
+        combined_targets = list(self.target_values) + list(new_target_values)
+
+        X = np.column_stack([combined_data[f] for f in self.features])
+        y = np.array(combined_targets)
+
+        if self.model_type == "REGRESSION":
+            self.model = RandomForestRegressor(n_estimators=45, max_depth=6, random_state=42)
+            self.model.fit(X, y)
+            score = float(self.model.score(X, y))
+            metric_name = "r2_score"
+            metric_val = round(score, 4)
+        else:
+            self.model = RandomForestClassifier(n_estimators=45, max_depth=6, random_state=42)
+            self.model.fit(X, y)
+            acc = float(self.model.score(X, y))
+            metric_name = "accuracy"
+            metric_val = round(acc, 4)
+
+        self.data_dict = combined_data
+        self.target_values = combined_targets
+
+        return {
+            "model_id": self.model_id,
+            "version": version_bump,
+            "metric_name": metric_name,
+            "metric_value": metric_val,
+            "total_training_samples": len(X),
+            "retrained_samples_added": len(new_target_values),
+        }
+
     def predict(self, feature_dict: Dict[str, float]) -> Tuple[Any, float]:
         vec = np.array([[feature_dict.get(f, 0.0) for f in self.features]])
         if self.model_type == "REGRESSION":

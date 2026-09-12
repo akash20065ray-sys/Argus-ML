@@ -41,6 +41,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target === rcaModal) rcaModal.classList.remove('open');
   });
 
+  // Bind Retrain & Download Report Buttons
+  const retrainBtn = document.getElementById('btn-rca-auto-retrain');
+  if (retrainBtn) {
+    retrainBtn.addEventListener('click', triggerAutoRetrain);
+  }
+
+  const downloadReportBtn = document.getElementById('btn-rca-download-report');
+  if (downloadReportBtn) {
+    downloadReportBtn.addEventListener('click', downloadPostMortemReport);
+  }
+
   // Quick auto-fill button
   const autoFillBtn = document.getElementById('btn-load-sample');
   if (autoFillBtn) {
@@ -525,8 +536,138 @@ async function handleRegisterModelSubmit(e) {
 
     document.getElementById('register-modal-backdrop').classList.remove('open');
     pollTelemetry();
+    showToast('🚀 Model Initialized', `Model ${result.model_id} registered and DAG constructed successfully!`, 'success');
   } catch (err) {
     console.error('Error uploading CSV model:', err);
     alert('Failed to register model.');
   }
+}
+
+/**
+ * Phase 7: 1-Click Automated Model Retraining Trigger
+ */
+async function triggerAutoRetrain() {
+  if (!activeModelMeta || !activeModelMeta.model_id) {
+    showToast('⚠️ No Active Model', 'Please select or initialize a model first.', 'warning');
+    return;
+  }
+
+  const modelId = activeModelMeta.model_id;
+  const retrainBtn = document.getElementById('btn-rca-auto-retrain');
+  if (retrainBtn) {
+    retrainBtn.disabled = true;
+    retrainBtn.innerHTML = '<span>⏳</span> Retraining Model...';
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/models/${modelId}/retrain`, {
+      method: 'POST',
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      showToast('❌ Retraining Failed', data.detail || 'Failed to retrain model.', 'error');
+      return;
+    }
+
+    // Close RCA modal on successful retraining
+    const rcaModal = document.getElementById('rca-modal-backdrop');
+    if (rcaModal) rcaModal.classList.remove('open');
+
+    showToast(
+      '✨ Retraining Successful',
+      `Model updated to ${data.new_version}. Baseline distributions refreshed & alerts cleared!`,
+      'success'
+    );
+
+    // Refresh telemetry immediately
+    pollTelemetry();
+  } catch (err) {
+    console.error('Error during auto-retraining:', err);
+    showToast('❌ Error', 'Connection error while retraining model.', 'error');
+  } finally {
+    if (retrainBtn) {
+      retrainBtn.disabled = false;
+      retrainBtn.innerHTML = '<span>⚡</span> 1-Click Auto-Retrain &amp; Resolve';
+    }
+  }
+}
+
+/**
+ * Phase 8: Download Incident Post-Mortem Report (.md)
+ */
+async function downloadPostMortemReport() {
+  if (!activeModelMeta) return;
+
+  const alertId = currentDiagnosis ? currentDiagnosis.incident_id || `INC-${Date.now()}` : `INC-${Date.now()}`;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/alerts/${alertId}/report`);
+    const data = await res.json();
+
+    if (!res.ok || !data.report_markdown) {
+      showToast('❌ Report Generation Failed', 'Could not generate report markdown.', 'error');
+      return;
+    }
+
+    // Trigger file download in browser
+    const blob = new Blob([data.report_markdown], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `argusml_post_mortem_${activeModelMeta.model_id}_${alertId}.md`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    showToast('📄 Report Exported', `Downloaded incident post-mortem report (${alertId}.md)`, 'success');
+  } catch (err) {
+    console.error('Error generating post-mortem report:', err);
+    showToast('❌ Export Error', 'Failed to download report markdown.', 'error');
+  }
+}
+
+/**
+ * Sleek Toast Notification UI
+ */
+function showToast(title, message, type = 'info') {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  const borderCol = type === 'success' ? 'var(--accent-emerald)' : type === 'error' ? 'var(--accent-crimson)' : 'var(--accent-cyan)';
+  const bgGlow = type === 'success' ? 'rgba(0, 245, 160, 0.15)' : type === 'error' ? 'rgba(255, 0, 85, 0.15)' : 'rgba(0, 242, 254, 0.15)';
+
+  toast.style.cssText = `
+    background: #0f1422;
+    background-image: radial-gradient(circle at top left, ${bgGlow}, transparent 70%);
+    border: 1px solid ${borderCol};
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 15px ${bgGlow};
+    border-radius: 8px;
+    padding: 12px 18px;
+    color: #fff;
+    min-width: 280px;
+    max-width: 400px;
+    font-size: 0.85rem;
+    pointer-events: auto;
+    animation: toast-fade-in 0.3s ease-out;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  `;
+
+  toast.innerHTML = `
+    <div style="font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between;">
+      <span>${title}</span>
+      <span style="cursor: pointer; opacity: 0.6; font-size: 1rem;" onclick="this.parentElement.parentElement.remove()">&times;</span>
+    </div>
+    <div style="color: var(--text-muted); font-size: 0.78rem; line-height: 1.4;">${message}</div>
+  `;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(10px)';
+    setTimeout(() => toast.remove(), 300);
+  }, 4500);
 }
