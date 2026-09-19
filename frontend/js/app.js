@@ -167,8 +167,8 @@ function renderDynamicDriftButtons(meta) {
     .map((fName) => {
       const cleanName = fName.replace('_', ' ');
       return `
-        <button class="sim-btn" data-feature="${fName}" onclick="injectFeatureDrift('${fName}')" title="Inject +350% covariate shift into ${cleanName}">
-          <span>⚡</span> Drift ${cleanName}
+        <button class="sim-btn" data-feature="${fName}" onclick="injectFeatureDrift('${fName}')" title="Inject covariate shift into ${cleanName}">
+          Drift ${cleanName}
         </button>
       `;
     })
@@ -536,7 +536,7 @@ async function handleRegisterModelSubmit(e) {
 
     document.getElementById('register-modal-backdrop').classList.remove('open');
     pollTelemetry();
-    showToast('🚀 Model Initialized', `Model ${result.model_id} registered and DAG constructed successfully!`, 'success');
+    showToast('Model Registered', `Model ${result.model_id} registered and dependency graph built.`, 'success');
   } catch (err) {
     console.error('Error uploading CSV model:', err);
     alert('Failed to register model.');
@@ -548,7 +548,7 @@ async function handleRegisterModelSubmit(e) {
  */
 async function triggerAutoRetrain() {
   if (!activeModelMeta || !activeModelMeta.model_id) {
-    showToast('⚠️ No Active Model', 'Please select or initialize a model first.', 'warning');
+    showToast('No Active Model', 'Please select or register a model first.', 'warning');
     return;
   }
 
@@ -556,7 +556,7 @@ async function triggerAutoRetrain() {
   const retrainBtn = document.getElementById('btn-rca-auto-retrain');
   if (retrainBtn) {
     retrainBtn.disabled = true;
-    retrainBtn.innerHTML = '<span>⏳</span> Retraining Model...';
+    retrainBtn.innerHTML = 'Retraining Model...';
   }
 
   try {
@@ -566,7 +566,7 @@ async function triggerAutoRetrain() {
     const data = await res.json();
 
     if (!res.ok) {
-      showToast('❌ Retraining Failed', data.detail || 'Failed to retrain model.', 'error');
+      showToast('Retraining Failed', data.detail || 'Failed to retrain model.', 'error');
       return;
     }
 
@@ -575,8 +575,8 @@ async function triggerAutoRetrain() {
     if (rcaModal) rcaModal.classList.remove('open');
 
     showToast(
-      '✨ Retraining Successful',
-      `Model updated to ${data.new_version}. Baseline distributions refreshed & alerts cleared!`,
+      'Retraining Completed',
+      `Model updated to ${data.new_version}. Baseline distributions refreshed.`,
       'success'
     );
 
@@ -584,11 +584,11 @@ async function triggerAutoRetrain() {
     pollTelemetry();
   } catch (err) {
     console.error('Error during auto-retraining:', err);
-    showToast('❌ Error', 'Connection error while retraining model.', 'error');
+    showToast('Error', 'Connection error while retraining model.', 'error');
   } finally {
     if (retrainBtn) {
       retrainBtn.disabled = false;
-      retrainBtn.innerHTML = '<span>⚡</span> 1-Click Auto-Retrain &amp; Resolve';
+      retrainBtn.innerHTML = 'Auto-Retrain Model';
     }
   }
 }
@@ -606,7 +606,7 @@ async function downloadPostMortemReport() {
     const data = await res.json();
 
     if (!res.ok || !data.report_markdown) {
-      showToast('❌ Report Generation Failed', 'Could not generate report markdown.', 'error');
+      showToast('Report Generation Failed', 'Could not generate report markdown.', 'error');
       return;
     }
 
@@ -615,16 +615,16 @@ async function downloadPostMortemReport() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `argusml_post_mortem_${activeModelMeta.model_id}_${alertId}.md`;
+    link.download = `incident_report_${activeModelMeta.model_id}_${alertId}.md`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
-    showToast('📄 Report Exported', `Downloaded incident post-mortem report (${alertId}.md)`, 'success');
+    showToast('Report Exported', `Saved incident report (${alertId}.md)`, 'success');
   } catch (err) {
     console.error('Error generating post-mortem report:', err);
-    showToast('❌ Export Error', 'Failed to download report markdown.', 'error');
+    showToast('Export Error', 'Failed to download report markdown.', 'error');
   }
 }
 

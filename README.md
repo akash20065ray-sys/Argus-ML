@@ -3,20 +3,21 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![DSA Core](https://img.shields.io/badge/DSA-Queue%20%7C%20Deque%20%7C%20HashMap%20%7C%20Heap%20%7C%20DAG-FF6B6B)]()
-[![Tests](https://img.shields.io/badge/Tests-10%2F10%20Passing-00F2A9)]()
-[![Architecture](https://img.shields.io/badge/Architecture-Universal%20MLOps-8E2DE2)]()
+[![Tests](https://img.shields.io/badge/Tests-12%2F12%20Passing-00F2A9)]()
+[![Architecture](https://img.shields.io/badge/Architecture-MLOps%20Observability-8E2DE2)]()
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> **ArgusML** is an all-in-one, domain-agnostic production AI Observability and automated Root-Cause Diagnostic Platform. Powered by five foundational Data Structures & Algorithms (DSA), it continuously monitors deployed machine learning models, detects real-world feature and performance drift in real time, isolates culprit features via reverse DAG traversal, and prioritizes critical failures in a Max-Heap before models cause business harm.
+> **ArgusML** is an end-to-end production AI observability and automated root-cause diagnostic platform. Built using five core Data Structures & Algorithms (DSA), it continuously monitors deployed machine learning models, detects real-world feature and performance drift in real time, isolates culprit features via reverse DAG traversal, and prioritizes critical failures in a Max-Heap before models cause business harm.
 
 ---
 
-### 📂 All-in-One Documentation & Architecture Bundle
-All system architecture diagrams, DSA engineering specifications, and presentation guides are consolidated in the [`docs/`](./docs) folder:
-* 🏛️ **[System Architecture Document](./docs/SYSTEM_ARCHITECTURE.md):** Complete multi-layer design & latency budgets.
-* 🖼️ **[Visual Architecture Diagram (SVG)](./docs/architecture_diagram.svg):** High-resolution system schematic.
-* 🧬 **[DSA Engineering Specifications](./docs/DSA_SPECIFICATION.md):** Big-O mathematical proofs & pseudocode.
-* 🎓 **[Presentation Deck & Viva Guide](./docs/PRESENTATION_AND_VIVA.md):** 10-slide deck & oral defense cheatsheet.
+### Documentation & Architecture Reference
+All architecture diagrams, DSA engineering proofs, literature reviews, and presentation guides are located in the [`docs/`](./docs) folder:
+* **[System Architecture Document](./docs/SYSTEM_ARCHITECTURE.md):** Complete multi-layer design & latency budgets.
+* **[Visual Architecture Diagram (SVG)](./docs/architecture_diagram.svg):** High-resolution system schematic.
+* **[DSA Engineering Specifications](./docs/DSA_SPECIFICATION.md):** Big-O mathematical proofs & pseudocode.
+* **[Literature Review](./docs/LITERATURE_REVIEW.md):** Comprehensive academic survey of distribution shift and MLOps telemetry.
+* **[Presentation Deck & Viva Guide](./docs/PRESENTATION_AND_VIVA.md):** 10-slide deck & oral defense cheatsheet.
 
 ---
 
