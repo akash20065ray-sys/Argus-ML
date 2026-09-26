@@ -1,10 +1,11 @@
 # 🛡️ ArgusML: Capstone Presentation & Team Defense Guide
 
-This document contains the **complete 12-slide presentation structure**, **5-member module division**, **word-for-word speaking script**, **code/file ownership breakdown**, and **viva Q&A defense answers**.
+This document contains the **complete 13-slide presentation structure**, **5-member module division**, **word-for-word speaking script**, **code/file ownership breakdown**, and **viva Q&A defense answers**.
 
-Generated Artifacts:
-- **PowerPoint Presentation File:** [`ArgusML_Presentation.pptx`](file:///C:/DS_CP/ArgusML_Presentation.pptx)
-- **Official Team Script PDF Document:** [`ArgusML_Team_Presentation_Script.pdf`](file:///C:/DS_CP/ArgusML_Team_Presentation_Script.pdf)
+Generated Artifacts in Downloads:
+- **PowerPoint Presentation File:** `ArgusML_Presentation.pptx` (CrimsonOrbit High-Contrast Theme)
+- **Official Team Script PDF Document:** `ArgusML_Team_Presentation_Script.pdf`
+- **Team Viva Question Bank PDF Document:** `ArgusML_Team_Viva_Question_Bank.pdf`
 
 ---
 
@@ -20,130 +21,170 @@ Generated Artifacts:
 
 ---
 
-## 📊 2. Slide Deck Outline (12 Slides)
+## 📊 2. Slide Deck Outline (13 Slides - CrimsonOrbit Theme)
 
 1. **Slide 1:** Title Slide & Project Overview
-2. **Slide 2:** Team Division & Individual Module Ownership (Mandatory 2nd Slide)
-3. **Slide 3:** Problem Statement & Industry Motivation (The Silent ML Decay)
-4. **Slide 4:** Core DSA Mapping & Algorithmic Complexity Table
-5. **Slide 5:** End-to-End System Architecture & Data Flow Pipeline
-6. **Slide 6:** Technical Deep-Dive: Aakash (Dynamic 4-Layer DAG & Reverse-BFS RCA)
+2. **Slide 2:** Problem Statement & Industry Motivation (The Silent ML Decay)
+3. **Slide 3:** Literature Review & Theoretical Positioning (Academic Survey & Prior Art)
+4. **Slide 4:** Proposed Solution & Core System Novelties
+5. **Slide 5:** System Architecture & Master Telemetry Pipeline (5 Distinct Layer Cards)
+6. **Slide 6:** Core DSA Mapping & Algorithmic Complexity Table
 7. **Slide 7:** Technical Deep-Dive: Krishna (Circular FIFO Queue, Deque & Drift Analytics)
-8. **Slide 8:** Technical Deep-Dive: Sanskar (Binary Max-Heap & 4-Step Retraining Gate)
-9. **Slide 9:** Technical Deep-Dive: Ghanshyam (In-Memory Baseline Hash Map & Traffic Simulator)
-10. **Slide 10:** Technical Deep-Dive: Hari (History Audit Drawer, Post-Mortems & Canvas Dashboard)
-11. **Slide 11:** Experimental Evaluation & 17 Unit Tests Verification
-12. **Slide 12:** Conclusion, Impact & Live Demonstration
+8. **Slide 8:** Technical Deep-Dive: Aakash (Dynamic 4-Layer DAG & Reverse-BFS RCA)
+9. **Slide 9:** Technical Deep-Dive: Sanskar (Binary Max-Heap & 4-Step Retraining Gate)
+10. **Slide 10:** Technical Deep-Dive: Ghanshyam (In-Memory Baseline Hash Map & Traffic Simulator)
+11. **Slide 11:** Technical Deep-Dive: Hari (History Audit Drawer, Post-Mortems & Canvas Dashboard)
+12. **Slide 12:** Team Division & Individual Module Ownership
+13. **Slide 13:** Experimental Evaluation, Conclusion & Live Demonstration
 
 ---
 
 ## 🎙️ 3. Complete Word-for-Word Speaking Script
 
-### 🎤 Slide 1 & 2: Introduction & Team Division
+### 🎤 Slide 1: Title & Overview
 **Speaker: AAKASH (Lead)**
 > *"Respected professors and panel members, good morning. Today, our team is presenting **ArgusML** — a Universal Production AI Observability and Graph-Powered Root Cause Diagnostic Platform built entirely upon 5 foundational Data Structures and Algorithms.*
 > 
-> *In today’s presentation, we have divided the technical modules cleanly among 5 team members:*
-> * *I (**Aakash**) am leading the central system orchestration, dynamic 4-layer DAG topology modeling, and Reverse-BFS root cause attribution.*
-> * ***Krishna*** *will present the high-throughput circular FIFO ingestion queue, sliding window deque, and Kolmogorov-Smirnov statistical drift engine.*
-> * ***Sanskar*** *will explain the binary max-heap priority queue and the closed-loop automated model retraining validation gate.*
-> * ***Ghanshyam*** *will detail the in-memory hash map model registry and universal multi-model traffic simulation engine.*
-> * ***Hari*** *will showcase our session history audit drawer, 1-click historical snapshot replay, and downloadable markdown post-mortem generator.*
+> *Modern enterprises deploy hundreds of machine learning models to production, but managing their reliability remains an unsolved challenge. Our goal with ArgusML was to build a pure, in-memory watchdog engine capable of sub-millisecond telemetry, automated statistical drift detection, topological root cause attribution, and closed-loop self-healing without relying on heavy third-party vendor stacks.*
 > 
-> *Let us begin with the core problem that motivated this project."*
+> *Let us begin by examining the core problem that motivated this capstone project."*
 
 ---
 
-### 🎤 Slide 3 & 4: Problem Statement & DSA Mapping
+### 🎤 Slide 2: Problem Statement & Industry Motivation
 **Speaker: AAKASH (Lead)**
-> *"Unlike traditional web servers that throw 500 internal errors when they break, machine learning models fail silently. Real-world consumer behavior shifts, causing data distributions to drift, while the model continues making confident, incorrect predictions. When a model’s accuracy drops from 95% to 65%, data engineering teams waste days manually tracing through dozens of multi-table ETL pipelines to isolate which specific feature was corrupted.*
+> *"Unlike traditional software services that crash with HTTP 500 errors when a bug occurs, machine learning models fail silently. As real-world customer behavior or sensor calibrations evolve, input distributions drift away from the training baseline. The model continues to output confident predictions, but its real-world accuracy silently collapses from 95% down to 65%.*
 > 
-> *ArgusML solves this by implementing an entirely in-memory, pure DSA architecture with zero third-party vendor bloat. As shown in our DSA Mapping table on Slide 4, every system component maps directly to optimal theoretical complexity:*
-> 1. *Circular FIFO Buffer for $O(1)$ ingestion without memory overflow.*
-> 2. *Double-Ended Queue for amortized $O(1)$ rolling performance metrics.*
-> 3. *In-Memory Hash Map for $O(1)$ model and baseline empirical distribution lookups.*
-> 4. *Binary Max-Heap for $O(\log N)$ composite severity prioritization.*
-> 5. *Dynamic Directed Acyclic Graph (DAG) for $O(V+E)$ reverse and forward BFS traversals.*
+> *When an accuracy drop is eventually discovered, data engineering teams face three severe bottlenecks:*
+> 1. *Manual Root-Cause Isolation: Engineers take days manually inspecting upstream multi-table ETL pipelines to find which specific feature became corrupted.*
+> 2. *SRE Alert Fatigue: Generic monitoring tools flood engineers with hundreds of uncorrelated metric alerts without composite severity prioritization.*
+> 3. *Manual Retraining Hazards: Models are retrained manually without strict validation gates, often accidentally promoting regressed candidates to production.*
 > 
-> *I will now hand over to Krishna to explain how live predictions enter the system and how statistical drift is detected."*
+> *Let us examine how academic literature and existing tools approach this problem."*
 
 ---
 
-### 🎤 Slide 5 & 7: Ingestion Buffer, Deque Window & Drift Engine
+### 🎤 Slide 3: Literature Review & Theoretical Positioning
+**Speaker: AAKASH (Lead)**
+> *"In our literature survey, we analyzed classical distribution shift paradigms:*
+> * *Covariate Shift, established by Shimodaira (2000), where input feature distributions $P(X)$ drift while conditional output relationships $P(Y|X)$ remain fixed.*
+> * *Concept Drift, formalized by Widmer and Kubat (1996), where relationships $P(Y|X)$ change over time due to external real-world shocks.*
+> 
+> *We evaluated several statistical distance metrics, including Wasserstein Distance, KL Divergence, the 2-Sample Kolmogorov-Smirnov test, and Population Stability Index (PSI). We selected the KS-test and PSI because the KS-test provides a non-parametric empirical CDF distance with rigorous p-value thresholds in $O(N \log N)$ time, while PSI delivers robust quantile-binned stability measurements in $O(N + B)$ time.*
+> 
+> *When comparing ArgusML against existing tools like Evidently AI and Datadog APM, existing solutions are either offline batch profile generators or infrastructure-only monitors. ArgusML is novel because it introduces an entirely in-memory DSA architecture and is the first system to integrate statistical tests with 4-layer dependency DAG Reverse-BFS for automated upstream attribution.*
+> 
+> *Let us now look at the proposed ArgusML solution."*
+
+---
+
+### 🎤 Slide 4 & 5: Proposed Solution & System Architecture
+**Speaker: AAKASH (Lead)**
+> *"ArgusML introduces a 5-pillar in-memory architecture designed for microsecond telemetry and automated remediation:*
+> 1. *A Pure In-Memory DSA Core executing in under 0.45 ms overhead.*
+> 2. *A Real-Time Drift Watchdog running KS-test and PSI evaluations every 25 streaming events.*
+> 3. *Topological Root Cause Attribution isolating corrupted features via Reverse-BFS.*
+> 4. *A Priority Max-Heap Queue ranking incidents by composite mathematical severity.*
+> 5. *A 4-Step Closed-Loop Retraining Validation Gate promoting recovered models with zero downtime.*
+> 
+> *As shown in our 5-layer System Architecture on Slide 5, live predictions flow seamlessly from the Ingestion Queue through the Metric Sliding Window, into the Statistical Drift Engine, across the Dynamic Dependency Graph, and finally into the Priority Alert Max-Heap.*
+> 
+> *I will now hand over to Krishna to present the DSA foundations and the Ingestion/Drift engine."*
+
+---
+
+### 🎤 Slide 6 & 7: Core DSA Mapping, Ingestion Buffer & Drift Analytics
 **Speaker: KRISHNA**
-> *"Thank you, Aakash. I will now explain how ArgusML continuously watches streaming inferences and detects distribution shifts.*
+> *"Thank you, Aakash. As shown on Slide 6, every ArgusML module maps directly to optimal theoretical complexity:*
+> * *EventQueue operates in strict $O(1)$ time with fixed circular buffer memory.*
+> * *MetricSlidingWindow provides amortized $O(1)$ compute across rolling windows.*
+> * *ModelRegistry provides $O(1)$ average-time baseline and SLA lookups.*
+> * *AlertMaxHeap guarantees $O(\log N)$ push and extraction bounds.*
+> * *DependencyGraph traverses upstream and downstream topology in $O(V + E)$ linear time.*
 > 
-> *When client applications send inference payloads to `POST /api/ingest`, they enter our **Circular FIFO EventQueue** (`queue.py`). We implemented modulo pointer arithmetic so that enqueuing and dequeuing operate strictly in $O(1)$ time with a fixed capacity of 5,000 events. If an extreme traffic spike occurs, oldest unconsumed records are evicted gracefully, completely preventing memory leaks.*
+> *On Slide 7, I will explain the Ingestion and Drift modules:*
+> * *When live predictions arrive at `POST /api/ingest`, our **Circular FIFO EventQueue** (`queue.py`) buffers events using modulo arithmetic: `tail = (tail + 1) % capacity`. It holds 5,000 events with zero memory allocation overflow.*
+> * *Our **MetricSlidingWindow** (`deque.py`) maintains recent $W = 400$ inferences, continuously updating rolling accuracy, precision, recall, and P99 latency in amortized $O(1)$ time.*
+> * *Every 25 events, our **DriftEngine** (`detector.py`) executes two statistical tests against baseline distributions: the 2-Sample Kolmogorov-Smirnov test ($D = \sup |F_{\text{base}}(x) - F_{\text{prod}}(x)|$, $p < 0.05$) and PSI across 10 quantile bins ($\text{PSI} \ge 0.25$ indicates critical drift).*
 > 
-> *Next, a background stream processor dequeues batches into our **MetricSlidingWindow** (`deque.py`), which is an in-memory double-ended queue holding recent $W = 400$ predictions. This allows us to calculate rolling accuracy, precision, recall, and P99 latency in amortized $O(1)$ time.*
-> 
-> *Every 25 processed events, our **DriftEngine** (`detector.py`) executes two statistical tests against the baseline distributions stored in our Hash Map:*
-> 1. ***Two-Sample Kolmogorov-Smirnov (KS) Test:*** *We compute the maximum vertical divergence $D$ between the baseline empirical cumulative distribution function (eCDF) and the sliding window in $O(N \log N)$ time. If $p < 0.05$, we flag significant covariate drift.*
-> 2. ***Population Stability Index (PSI):*** *We bucket feature values across quantile bins in $O(N + B)$ time. A PSI $\ge 0.25$ indicates critical distribution shift.*
-> 
-> *Once drift is detected, Aakash’s DAG engine is triggered to isolate the root cause."*
+> *Once drift is detected, Aakash's DAG engine triggers root cause attribution."*
 
 ---
 
-### 🎤 Slide 6: Dynamic DAG & Root Cause Confidence Scoring (RCS)
+### 🎤 Slide 8: Dynamic DAG & Root Cause Confidence Scoring (RCS)
 **Speaker: AAKASH (Lead)**
-> *"Once statistical drift is flagged, our **DependencyGraph** (`graph.py`) performs automated root cause attribution.*
+> *"Thank you, Krishna. On Slide 8, I will explain our **Dynamic Dependency DAG** (`graph.py`) and the **Root Cause Confidence Scoring (RCS)** engine.*
 > 
-> *The DAG dynamically builds a 4-layer topology:*  
+> *The graph dynamically builds a 4-layer topology:*  
 > `Upstream Pipelines → Inferred Features → Active Model → Downstream Services`.*
 > 
-> *We execute two Breadth-First Search traversals, both operating in $O(V + E)$ linear time:*
-> 1. ***Reverse-BFS Upstream Attribution:*** *Starting at the degraded Model node, we traverse reverse adjacency lists upstream to find which specific feature node and upstream ingestion pipeline originated the corruption.*
-> 2. ***Forward-BFS Downstream Blast Radius:*** *We traverse forward adjacency lists downstream from the model node to identify every production consumer API and reporting service impacted.*
+> *When model performance degrades, we execute two Breadth-First Search traversals in $O(V + E)$ time:*
+> 1. ***Reverse-BFS Upstream Attribution:*** *Starting at the degraded Model node, we traverse reverse adjacency lists upstream to pinpoint the culprit drifting feature and its originating ETL ingestion source.*
+> 2. ***Forward-BFS Downstream Blast Radius:*** *Starting from the model node, we traverse forward adjacency lists to compute the exact set of impacted downstream microservices and APIs.*
 > 
-> *To rank candidate causes with mathematical rigor, I designed the **Root Cause Confidence Score (RCS)** formula:*  
+> *To provide mathematical certainty, I formulated the **Root Cause Confidence Score (RCS)**:*  
 > $\text{RCS} = (0.45 \times \text{DriftEvidence}) + (0.30 \times \text{AccuracyDrop}) + (0.15 \times \text{TopologyProximity}) + (0.10 \times \text{BlastImpact})$.  
-> *This pinpoints the true culprit feature with over 85% to 95% confidence.*
+> *This isolates the primary culprit feature with over 85% to 95% confidence.*
 > 
-> *I will now hand over to Sanskar to explain how incidents are prioritized in the Max-Heap and how automated retraining cures the model."*
+> *I now invite Sanskar to explain the Priority Max-Heap and automated retraining."*
 
 ---
 
-### 🎤 Slide 8: Priority Max-Heap & Retraining Validation Gate
+### 🎤 Slide 9: Incident Priority Max-Heap & 4-Step Retraining Gate
 **Speaker: SANSKAR**
-> *"Thank you, Aakash. I will now explain our **AlertMaxHeap** and the **Closed-Loop Automated Model Retraining Pipeline**.*
+> *"Thank you, Aakash. On Slide 9, I will present our **AlertMaxHeap** (`heap.py`) and the **Closed-Loop Automated Retraining Pipeline** (`orchestrator.py`).*
 > 
-> *In production environments monitoring multiple models, alerts must be prioritized so SREs tackle the most dangerous failures first. We implemented a pure, array-backed **Binary Max-Heap** (`heap.py`) using pure `_sift_up` and `_sift_down` pointer swaps. Pushing a new incident and extracting the maximum severity incident both run in strict $O(\log N)$ time, while peeking the top incident is $O(1)$. Incidents are ranked by composite severity taking into account accuracy drop, drift magnitude, and blast radius.*
+> *To prevent SRE alert fatigue in multi-model environments, we implemented a pure, array-backed **Binary Max-Heap** using custom `_sift_up` and `_sift_down` methods. Pushing new incidents and extracting the critical top incident both execute in strict $O(\log N)$ time, while peeking is $O(1)$. Incidents are prioritized by composite severity taking into account accuracy drop, drift magnitude, and blast radius.*
 > 
-> *When an incident occurs, our **Automated Retraining Engine** (`orchestrator.py`) allows 1-click remediation with a strict **4-Step Validation Gate**:*
-> 1. *It collects recent sliding window observations and fits a candidate model to the drifted distribution.*
-> 2. *It evaluates 4 validation criteria: Data sufficiency, Accuracy $\ge$ SLA target, Latency $\le$ SLA threshold, and positive $R^2$ score.*
-> 3. *If validation passes, the candidate is promoted to production, the version is bumped (e.g. `v1.0.0` $\rightarrow$ `v1.1.0`), Hash Map baselines are refreshed, active Max-Heap alerts are resolved, and DAG node health resets to HEALTHY.*
+> *When an incident requires remediation, our 1-Click Retraining Engine executes a **4-Step Validation Gate**:*
+> 1. *Verifies observation sufficiency in the sliding window.*
+> 2. *Re-fits model decision boundaries to the shifted distribution.*
+> 3. *Validates candidate accuracy $\ge$ SLA target, latency $\le$ SLA threshold, and positive $R^2$.*
+> 4. *Promotes the candidate to production with zero downtime, bumps the version (e.g. `v1.0.0` $\rightarrow$ `v1.1.0`), refreshes baseline distributions in HashMap, resolves Max-Heap alerts, and resets DAG node health to HEALTHY.*
 > 
-> *I will now pass to Ghanshyam to explain our Model Registry and Traffic Simulator."*
+> *I now pass to Ghanshyam to cover the Model Registry and Traffic Simulator."*
 
 ---
 
-### 🎤 Slide 9: In-Memory Model Registry & Traffic Simulator
+### 🎤 Slide 10: In-Memory Baseline Registry & Traffic Simulator
 **Speaker: GHANSHYAM**
-> *"Thank you, Sanskar. I will cover the **ModelRegistry** and our **Universal Traffic Simulation Engine**.*
+> *"Thank you, Sanskar. On Slide 10, I will present the **ModelRegistry** (`registry.py`) and our **Universal Traffic Simulator** (`traffic_simulator.py`).*
 > 
-> *The **ModelRegistry** (`registry.py`) serves as our central in-memory Hash Map baseline store. It provides $O(1)$ constant-time lookup for model metadata, SLA thresholds, and empirical baseline distribution moments (mean, variance, min, max, and quantiles). It universally supports both **Classification models** (tracking Accuracy and F1) and **Regression models** (tracking MAE, RMSE, and $R^2$).*
+> *The **ModelRegistry** is our in-memory Hash Map baseline store, providing $O(1)$ constant-time lookup for model metadata, SLA thresholds, and empirical baseline distribution moments (mean, variance, min, max, and quantiles). It universally supports both **Classification** and **Regression** models.*
 > 
-> *To enable comprehensive testing without external hardware, I built the **UniversalTrafficSimulator** (`traffic_simulator.py`). It runs a background streaming thread pushing realistic predictions with Gaussian noise into the EventQueue at 20 events per second. It features controlled covariate shift injection — allowing users to dynamically multiply any feature’s distribution by 3.5x or spike latency by +250ms with a single click.*
+> *To thoroughly validate the system under real-world conditions, I built the **UniversalTrafficSimulator**. It streams synthetic inference events into the EventQueue at 20 events per second with Gaussian distribution noise. It features an interactive Covariate Shift Injector — allowing users to scale any feature's distribution by 3.5x or spike latency by +250ms with a single click to trigger live drift.*
 > 
-> *Furthermore, our CSV upload parser automatically extracts numerical columns, fits reference models, registers baselines in HashMap, and builds dynamic DAG topologies on the fly.*
+> *Additionally, our CSV parser automatically extracts numerical columns, fits reference models, registers baselines in HashMap, and generates dynamic DAG topologies on the fly.*
 > 
-> *I now hand over to Hari to present our session audit history, post-mortem generator, and user interface."*
+> *I now hand over to Hari to present session history, post-mortems, and our user interface."*
 
 ---
 
-### 🎤 Slide 10, 11 & 12: Session History, Post-Mortems & Live Demo
+### 🎤 Slide 11: History Drawer, Post-Mortems & Canvas Dashboard
 **Speaker: HARI**
-> *"Thank you, Ghanshyam. I will present our **Testing & Observability Session History Drawer**, **Incident Post-Mortem Exporter**, and the front-end dashboard.*
+> *"Thank you, Ghanshyam. On Slide 11, I will present our **ModelTestingHistory** (`history.py`), **Incident Post-Mortem Generator**, and the frontend dashboard.*
 > 
-> *In production, auditability is essential. We implemented **ModelTestingHistory** (`history.py`), which maintains a thread-safe chronological record of all model registrations, live drift detections, retraining runs, and switches. New session snapshots are prepended in $O(1)$ time. With our **1-Click Historical Snapshot Replay**, clicking any card in the drawer immediately loads the exact DAG topology canvas, statistical indicators (KS/PSI), and blast radius captured during that test run.*
+> *In production environments, full auditability is critical. We built a thread-safe chronological session drawer that captures all model tests, drift alerts, registrations, and retraining runs with $O(1)$ prepend operations. With our **1-Click DAG Snapshot Replay**, clicking any card in the drawer immediately loads the exact historical DAG topology, statistical indicators (KS/PSI), and blast radius captured during that run.*
 > 
-> *Our **Incident Post-Mortem Generator** automatically exports a comprehensive Markdown report documenting the executive summary, primary culprit feature, candidate RCS confidence rankings, impacted downstream services, and remediation logs.*
+> *Our **Post-Mortem Engine** automatically compiles and downloads a comprehensive Markdown post-mortem report documenting executive summaries, culprit feature rankings, and automated remediation logs.*
 > 
-> *Finally, our web dashboard is built with clean Vanilla HTML5, CSS3, and an interactive Canvas 2D DAG renderer with pulsating node halos. All 17 unit tests in our Pytest suite pass with 100% success.*
+> *Finally, our dashboard is built with clean Vanilla HTML5, CSS3, and an interactive Canvas 2D DAG renderer with pulsating node health halos.*
 > 
-> *We are now ready for the live demonstration and panel questions."*
+> *I will now pass back to Aakash for the team breakdown and experimental conclusion."*
+
+---
+
+### 🎤 Slide 12 & 13: Team Contribution Breakdown, Evaluation & Live Demo
+**Speaker: AAKASH (Lead)**
+> *"On Slide 12, we summarize our team's module ownership and code contributions across the 5 core DSA components.*
+> 
+> *On Slide 13, we present our experimental evaluation results:*
+> * *All 17 unit tests in our Pytest suite pass with 100% success across all DSA modules.*
+> * *Telemetry compute overhead averages under 0.45 ms per prediction, preserving live API throughput.*
+> * *Reverse-BFS RCA achieved 100% accuracy in isolating culprit features across simulated drift scenarios.*
+> * *Automated retraining recovered model accuracy from 68% back to 96% with zero downtime.*
+> 
+> *We are now excited to demonstrate the live ArgusML platform running at `http://127.0.0.1:8000` and look forward to your questions."*
 
 ---
 
