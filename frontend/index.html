@@ -357,8 +357,13 @@
 
       <!-- Culprit Feature Banner -->
       <div class="rca-culprit-banner">
-        <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.6px; color: var(--accent-crimson); margin-bottom: 4px;">
-          Primary Culprit Feature (Reverse-BFS)
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.6px; color: var(--accent-crimson);">
+            Primary Culprit Feature (Reverse-BFS)
+          </div>
+          <span id="rca-confidence-badge" class="alert-badge badge-critical" style="font-size: 0.72rem;">
+            92.4% Confidence
+          </span>
         </div>
         <div style="font-size: 1.1rem; font-family: var(--font-mono); font-weight: 700; color: #fff; margin-bottom: 8px;">
           Feature: <span id="rca-culprit-feature" style="color: var(--accent-crimson);">monthly_charges</span>
@@ -382,6 +387,16 @@
         <p id="rca-diagnosis-text" style="font-size: 0.82rem; color: #e2e8f0; margin-top: 10px; line-height: 1.4;"></p>
       </div>
 
+      <!-- Ranked Candidate Root Causes (RCS Multi-Factor Scoring) -->
+      <div style="margin-top: 14px;">
+        <div style="font-size: 0.76rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">
+          Ranked Candidate Causes (Confidence Score RCS):
+        </div>
+        <div id="rca-candidates-list" style="display: flex; flex-direction: column; gap: 6px;">
+          <!-- Dynamically populated candidate causes -->
+        </div>
+      </div>
+
       <!-- Downstream Blast Radius -->
       <div style="margin-top: 14px;">
         <div style="font-size: 0.76rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">
@@ -398,6 +413,19 @@
           Recommended Action:
         </div>
         <div id="rca-remediation-text" class="remediation-box"></div>
+      </div>
+
+      <!-- Validation Gate Feedback Container (populated after retraining) -->
+      <div id="rca-validation-gate-container" style="display: none; margin-top: 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; padding: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-cyan);">
+            Closed-Loop Model Validation Gate
+          </div>
+          <span id="gate-overall-badge" class="alert-badge badge-healthy">PASS</span>
+        </div>
+        <div id="gate-checks-list" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 0.75rem;">
+          <!-- Check items -->
+        </div>
       </div>
 
       <!-- Action Buttons -->

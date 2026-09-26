@@ -464,10 +464,60 @@ function openRcaModal(diag) {
 
   const rc = diag.root_cause || {};
   document.getElementById('rca-culprit-feature').textContent = rc.culprit_feature || 'N/A';
+  
+  const confBadge = document.getElementById('rca-confidence-badge');
+  if (confBadge) {
+    const confScore = rc.confidence_score !== undefined ? rc.confidence_score : 85.0;
+    confBadge.textContent = `${confScore}% Confidence`;
+    confBadge.className = `alert-badge ${confScore >= 70 ? 'badge-critical' : confScore >= 40 ? 'badge-high' : 'badge-healthy'}`;
+  }
+
   document.getElementById('rca-ks-stat').textContent = rc.ks_statistic ? rc.ks_statistic.toFixed(4) : '0.0';
   document.getElementById('rca-psi-stat').textContent = rc.psi ? rc.psi.toFixed(4) : '0.0';
   document.getElementById('rca-shift-pct').textContent = `${rc.mean_shift_pct > 0 ? '+' : ''}${rc.mean_shift_pct || 0}%`;
   document.getElementById('rca-diagnosis-text').textContent = rc.diagnosis || '';
+
+  // Render Ranked Candidate Root Causes
+  const candidatesContainer = document.getElementById('rca-candidates-list');
+  const candidates = diag.candidate_root_causes || [];
+  if (candidatesContainer) {
+    if (candidates.length === 0) {
+      candidatesContainer.innerHTML = '<div style="color: var(--text-dim); font-size: 0.78rem;">No feature-level covariate shift recorded.</div>';
+    } else {
+      candidatesContainer.innerHTML = candidates
+        .map((c, idx) => {
+          const isTop = idx === 0;
+          const conf = c.confidence_score || 0;
+          const barWidth = Math.min(100, Math.max(8, conf));
+          const badgeClass = conf >= 70 ? 'badge-critical' : conf >= 40 ? 'badge-high' : 'badge-healthy';
+          return `
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid ${isTop ? 'rgba(239, 68, 68, 0.4)' : 'rgba(255,255,255,0.06)'}; border-radius: 5px; padding: 8px 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <div style="font-family: var(--font-mono); font-weight: 700; color: ${isTop ? 'var(--accent-crimson)' : 'var(--text-main)'}; font-size: 0.8rem;">
+                  #${idx + 1} ${c.feature}
+                </div>
+                <span class="alert-badge ${badgeClass}" style="font-size: 0.68rem;">
+                  RCS: ${conf}%
+                </span>
+              </div>
+              <div style="background: rgba(255,255,255,0.08); height: 4px; border-radius: 2px; overflow: hidden; margin-bottom: 6px;">
+                <div style="background: ${isTop ? 'var(--accent-crimson)' : 'var(--accent-cyan)'}; width: ${barWidth}%; height: 100%;"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-dim); font-family: var(--font-mono);">
+                <span>KS: ${c.ks_statistic} | PSI: ${c.psi}</span>
+                <span>Shift: ${c.mean_shift_pct > 0 ? '+' : ''}${c.mean_shift_pct}%</span>
+                <span>Source: ${c.upstream_source}</span>
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+  }
+
+  // Reset validation gate view on fresh modal open
+  const gateContainer = document.getElementById('rca-validation-gate-container');
+  if (gateContainer) gateContainer.style.display = 'none';
 
   // Blast Radius
   const blastContainer = document.getElementById('rca-blast-radius-list');
@@ -544,7 +594,7 @@ async function handleRegisterModelSubmit(e) {
 }
 
 /**
- * Phase 7: 1-Click Automated Model Retraining Trigger
+ * Phase 7: 1-Click Automated Model Retraining Trigger with Validation Gate
  */
 async function triggerAutoRetrain() {
   if (!activeModelMeta || !activeModelMeta.model_id) {
@@ -556,7 +606,7 @@ async function triggerAutoRetrain() {
   const retrainBtn = document.getElementById('btn-rca-auto-retrain');
   if (retrainBtn) {
     retrainBtn.disabled = true;
-    retrainBtn.innerHTML = 'Retraining Model...';
+    retrainBtn.innerHTML = 'Evaluating Validation Gate...';
   }
 
   try {
@@ -570,17 +620,47 @@ async function triggerAutoRetrain() {
       return;
     }
 
-    // Close RCA modal on successful retraining
-    const rcaModal = document.getElementById('rca-modal-backdrop');
-    if (rcaModal) rcaModal.classList.remove('open');
+    // Populate Closed-Loop Validation Gate card
+    const gateContainer = document.getElementById('rca-validation-gate-container');
+    const gateBadge = document.getElementById('gate-overall-badge');
+    const gateList = document.getElementById('gate-checks-list');
 
-    showToast(
-      'Retraining Completed',
-      `Model updated to ${data.new_version}. Baseline distributions refreshed.`,
-      'success'
-    );
+    if (data.validation_report) {
+      const rep = data.validation_report;
+      if (gateContainer) gateContainer.style.display = 'block';
+      if (gateBadge) {
+        gateBadge.textContent = rep.gate_status;
+        gateBadge.className = `alert-badge ${rep.gate_status === 'PASS' ? 'badge-healthy' : 'badge-critical'}`;
+      }
+      if (gateList && rep.checks) {
+        gateList.innerHTML = rep.checks
+          .map(
+            (chk) => `
+            <div style="background: rgba(0,0,0,0.3); padding: 6px 8px; border-radius: 4px; border-left: 2px solid ${chk.passed ? 'var(--accent-emerald)' : 'var(--accent-crimson)'};">
+              <div style="font-weight: 600; color: #fff;">${chk.passed ? '✓' : '✗'} ${chk.gate}</div>
+              <div style="color: var(--text-dim); font-size: 0.7rem; font-family: var(--font-mono);">${chk.value} (${chk.target})</div>
+            </div>
+          `
+          )
+          .join('');
+      }
+    }
 
-    // Refresh telemetry immediately
+    if (data.gate_status === 'PASS') {
+      showToast(
+        'Validation Gate Passed',
+        `Candidate promoted to ${data.new_version}. Baseline distributions refreshed.`,
+        'success'
+      );
+    } else {
+      showToast(
+        'Validation Gate Rejected',
+        `Candidate failed validation criteria. Current version kept active.`,
+        'warning'
+      );
+    }
+
+    // Refresh telemetry
     pollTelemetry();
   } catch (err) {
     console.error('Error during auto-retraining:', err);
