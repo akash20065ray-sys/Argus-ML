@@ -20,3 +20,9 @@ ENV/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Presentation & PDF exports (kept in local Downloads)
+*.pptx
+*.pdf
+*.zip
+

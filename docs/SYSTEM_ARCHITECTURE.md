@@ -180,7 +180,59 @@ $$S = \min\left(100.0, \; \max\left(10.0, \; (w_{\text{acc}} \cdot \Delta\text{A
    * `EventQueue` uses fine-grained mutex with condition variables (`threading.Condition`), allowing safe multi-producer ingestion.
    * `MetricSlidingWindow` uses atomic counter updates under a dedicated thread lock.
    * `DependencyGraph` reads and traversals are protected by `threading.Lock`.
+   * `AlertMaxHeap` and `ModelTestingHistory` use dedicated `threading.Lock` primitives.
 2. **Latency Budgets:**
    * Ingestion endpoint (`POST /api/ingest`): **$< 1.5\text{ ms}$**
    * Dashboard poll endpoint (`GET /api/dashboard`): **$< 4.0\text{ ms}$**
    * Reverse-BFS RCA Traversal: **$< 0.2\text{ ms}$**
+
+---
+
+## 9. Closed-Loop Automated Model Retraining Gate (Phase 7)
+
+To eliminate manual model regression risks, ArgusML enforces an automated 4-step validation gate before promoting retrained candidate models to production:
+
+```
+[Trigger 1-Click Retrain]
+       │
+       ▼
+[1. Data Sufficiency Check] ──(N < 20)──> Synthesize Adaptive Distribution Batch
+       │ (N >= 20)
+       ▼
+[2. Candidate Model Re-Fitting] ──> Fit model on recent sliding window distribution
+       │
+       ▼
+[3. 4-Step Validation Gate]
+       ├── Check 1: Candidate Accuracy >= Model SLA Target
+       ├── Check 2: Candidate P99 Latency <= Model SLA Latency
+       ├── Check 3: Candidate Score > Degraded Active Model Score
+       └── Check 4: Non-negative R² Score (for Regression)
+       │
+       ├──(ANY FAILED)──> REJECT: Current active model remains in production
+       │
+       └──(ALL PASSED)──> PROMOTE:
+                           ├── Bump Model Version (e.g. v1.0.0 -> v1.1.0)
+                           ├── Refresh ModelRegistry Empirical Baselines (HashMap)
+                           ├── Resolve Active Incidents in AlertMaxHeap
+                           └── Reset DependencyGraph Node Health to HEALTHY
+```
+
+---
+
+## 10. Automated Incident Post-Mortem Exporter (Phase 8)
+
+ArgusML automatically synthesizes comprehensive, production-grade Markdown post-mortem reports upon incident detection or resolution via `GET /api/alerts/{alert_id}/report`. Reports document:
+* **Executive Summary:** Incident timestamp, model ID, version, severity level, priority score.
+* **Root Cause Attribution:** Primary culprit feature, KS statistic ($D$), PSI score, observed mean shift ($\%$), upstream ETL origin, and candidate causes ranked by Root Cause Confidence ($RCS$).
+* **Blast Radius Impact:** Exhaustive list of affected downstream consumer APIs and reporting microservices discovered via Forward-BFS.
+* **Closed-Loop Remediation Logs:** Automated candidate retraining reports and validation gate scores.
+
+---
+
+## 11. Chronological Session Audit History Drawer & Snapshot Replay (Phase 9)
+
+Maintained via `ModelTestingHistory` (`backend/app/core/dsa/history.py`), the platform records an auditable history of all model registrations, live drift detections, retraining events, and telemetry switches:
+* **In-Memory Audit List:** Thread-safe circular storage (capacity $N = 100$) with $O(1)$ fast prepend.
+* **In-Place Deduplication:** Automatically merges rapid duplicate drift telemetry checks within a 4-second window to prevent audit log spam.
+* **1-Click Historical Snapshot Replay:** Each record stores a deep-copy snapshot of `graph_snapshot` and `diagnosis_output`. Clicking any historical card in the frontend drawer replays the exact canvas topology and culprit highlighting captured during that test run.
+
