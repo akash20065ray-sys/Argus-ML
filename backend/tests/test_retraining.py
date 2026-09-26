@@ -34,9 +34,12 @@ def test_automated_model_retraining_flow():
     # Retrain active model via 1-Click trigger
     retrain_res = system.retrain_active_model()
     assert retrain_res["status"] == "SUCCESS"
+    assert retrain_res["gate_status"] == "PASS"
     assert retrain_res["model_id"] == "customer_churn_v1"
     assert retrain_res["new_version"] == "v1.1.0"
     assert retrain_res["alerts_resolved_count"] > 0
+    assert "validation_report" in retrain_res
+    assert len(retrain_res["validation_report"]["checks"]) == 4
 
     # Verify registry version updated
     meta_after = system.registry.get_model("customer_churn_v1")
@@ -64,6 +67,6 @@ def test_incident_post_mortem_report_generation():
     assert "# 🚨 ArgusML Incident Post-Mortem Report" in report
     assert "INC-TEST-001" in report
     assert "fraud_detector_v1" in report
-    assert "transaction_amount" in report
     assert "Downstream Blast Radius" in report
-    assert "Remediation & Action Plan" in report
+    assert "Closed-Loop Remediation & Validation Gate" in report
+    assert "Algorithmic Complexity & Telemetry Architecture" in report

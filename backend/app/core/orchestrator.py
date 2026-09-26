@@ -251,9 +251,10 @@ class ArgusSystem:
 
     def retrain_active_model(self) -> Dict[str, Any]:
         """
-        Phase 7: Automated 1-Click Model Retraining Trigger.
-        Extracts recent drifted window distribution, retrains model,
-        updates baseline distributions in HashMap, clears alerts, and restores health.
+        Phase 7: Automated 1-Click Model Retraining with Closed-Loop Validation Gate.
+        Creates a candidate model trained on recent distribution window, evaluates the
+        4-step validation gate, promotes to production upon passing, updates baseline
+        distributions in HashMap, resolves Max-Heap alerts, and resets node health.
         """
         if not self.active_model_id or self.active_model_id not in self.models_map:
             raise ValueError("No active model to retrain.")
@@ -282,7 +283,7 @@ class ArgusSystem:
                     new_data_dict[f].append(s_feat[f])
                 new_targets.append(s_gt)
 
-        # 2. Retrain model on updated distribution
+        # 2. Determine target version
         current_version = getattr(meta, "version", "v1.0.0")
         try:
             parts = current_version.replace("v", "").split(".")
@@ -290,21 +291,47 @@ class ArgusSystem:
         except Exception:
             new_v = "v1.1.0"
 
-        retrain_result = model.retrain_on_data(
+        # 3. Create candidate model & evaluate 4-step Validation Gate
+        candidate = model.create_candidate(
             new_data_dict=new_data_dict,
             new_target_values=new_targets,
-            version_bump=new_v,
+            candidate_version=new_v,
         )
 
-        # 3. Update ModelRegistry baseline distributions in HashMap
-        for feat_name in model.features:
-            samples = model.data_dict[feat_name]
+        sla_min_acc = meta.sla_min_accuracy if meta else 0.85
+        sla_p99_lat = meta.sla_max_p99_latency_ms if meta else 200.0
+
+        val_report = model.evaluate_validation_gate(
+            candidate_model=candidate,
+            test_data_dict=candidate.data_dict,
+            test_targets=candidate.target_values,
+            sla_min_accuracy=sla_min_acc,
+            sla_max_p99_latency_ms=sla_p99_lat,
+        )
+
+        if not val_report["all_passed"]:
+            return {
+                "status": "REJECTED",
+                "gate_status": "REJECTED",
+                "model_id": self.active_model_id,
+                "model_name": model.name,
+                "current_version": current_version,
+                "validation_report": val_report,
+                "message": f"Candidate model {new_v} failed validation gate. Promotion blocked; current version remains active.",
+            }
+
+        # 4. Promotion Gate Passed: Promote candidate to active production model
+        self.models_map[self.active_model_id] = candidate
+
+        # 5. Update ModelRegistry baseline distributions in HashMap
+        for feat_name in candidate.features:
+            samples = candidate.data_dict[feat_name]
             self.registry.register_feature_baseline(self.active_model_id, feat_name, samples)
 
         if meta:
             meta.version = new_v
 
-        # 4. Clear active alerts in Max-Heap and reset node health to HEALTHY
+        # 6. Clear active alerts in Max-Heap and reset node health to HEALTHY
         resolved_count = 0
         with self.alert_heap.lock:
             for alert in list(self.alert_heap.heap):
@@ -316,7 +343,7 @@ class ArgusSystem:
         for node_id in self.graph.nodes:
             self.graph.set_node_health(node_id, "HEALTHY")
 
-        # 5. Reset simulator feature drift and sliding window
+        # 7. Reset simulator feature drift and sliding window
         if self.simulator:
             self.simulator.reset()
         self.sliding_window.clear()
@@ -326,14 +353,16 @@ class ArgusSystem:
 
         return {
             "status": "SUCCESS",
+            "gate_status": "PASS",
             "model_id": self.active_model_id,
-            "model_name": model.name,
+            "model_name": candidate.name,
             "new_version": new_v,
-            "recovered_metric": retrain_result.get("metric_name", "accuracy"),
-            "metric_value": retrain_result.get("metric_value", 0.96),
-            "samples_trained": retrain_result.get("total_training_samples", 0),
+            "recovered_metric": val_report.get("metric_name", "Accuracy"),
+            "metric_value": val_report.get("candidate_score", 0.96),
+            "samples_trained": len(candidate.target_values),
             "alerts_resolved_count": resolved_count,
-            "message": f"Model {self.active_model_id} retrained successfully to {new_v}. Baselines updated, alert resolved.",
+            "validation_report": val_report,
+            "message": f"Candidate model validated and promoted to {new_v}. Baselines updated, Max-Heap alerts resolved.",
         }
 
     def generate_incident_report(self, alert_id: Optional[str] = None) -> str:
@@ -343,8 +372,15 @@ class ArgusSystem:
         meta = self.registry.get_model(self.active_model_id) if self.active_model_id else None
         diag = self.latest_diagnosis or {}
         rc = diag.get("root_cause", {})
+        candidates = diag.get("candidate_root_causes", [])
         perf = diag.get("performance_summary", {})
         blast = diag.get("blast_radius", [])
+
+        candidate_rows = ""
+        for c in candidates:
+            candidate_rows += f"| `{c.get('feature')}` | **{c.get('confidence_score')}%** | {c.get('ks_statistic')} | {c.get('psi')} | {c.get('mean_shift_pct')}% | `{c.get('upstream_source')}` |\n"
+        if not candidate_rows:
+            candidate_rows = "| `None` | `0.0%` | - | - | - | - |\n"
 
         report = f"""# 🚨 ArgusML Incident Post-Mortem Report
 
@@ -357,18 +393,23 @@ class ArgusSystem:
 ---
 
 ## 1. Executive Incident Summary
-During continuous production observability, ArgusML detected a significant distribution shift and performance SLA violation on model `{self.active_model_id}`. Real-time telemetry recorded an accuracy drop of **{perf.get('accuracy_drop_pct', 15.2)}%** (Current: {perf.get('current_accuracy', 0.74)}, Target SLA: {perf.get('sla_target', 0.88)}) with P99 inference latency at **{perf.get('p99_latency_ms', 58.4)} ms**.
+During continuous production observability, ArgusML detected a distribution shift and performance SLA violation on model `{self.active_model_id}`. Real-time telemetry recorded an accuracy drop of **{perf.get('accuracy_drop_pct', 15.2)}%** (Current: {perf.get('current_accuracy', 0.74)}, Target SLA: {perf.get('sla_target', 0.88)}) with P99 inference latency at **{perf.get('p99_latency_ms', 58.4)} ms**.
 
 ---
 
-## 2. Root Cause Analysis (Reverse-BFS DAG Attribution)
-* **Primary Culprit Feature:** `{rc.get('culprit_feature', 'Unknown')}`
+## 2. Root Cause Attribution (Reverse-BFS DAG & Multi-Candidate RCS)
+* **Primary Culprit Feature:** `{rc.get('culprit_feature', 'Unknown')}` (Confidence: **{rc.get('confidence_score', 0.0)}%**)
 * **Kolmogorov-Smirnov Statistic (D):** `{rc.get('ks_statistic', 0.485)}` (p-value < 0.0001)
 * **Population Stability Index (PSI):** `{rc.get('psi', 1.142)}` (Threshold: >= 0.25 is Critical)
 * **Observed Mean Shift:** `{rc.get('mean_shift_pct', '+320.0')}%`
 * **Upstream Ingestion Source:** `{rc.get('upstream_source', 'Data Ingestion Stream ETL')}`
 * **Automated Diagnostic Statement:**
   > {rc.get('diagnosis', 'Severe covariate shift detected in upstream feature distribution.')}
+
+### Candidate Root Causes Ranked by Confidence Score ($RCS$)
+| Candidate Feature | Confidence (RCS) | KS Stat (D) | PSI Score | Mean Shift | Upstream Origin |
+|:---|:---|:---|:---|:---|:---|
+{candidate_rows}
 
 ---
 
@@ -378,17 +419,18 @@ The degradation directly impacted the following downstream production microservi
 
 ---
 
-## 4. Remediation & Action Plan
-{diag.get('remediation', '1. Trigger automated retraining on recent distribution window.\n2. Inspect upstream ETL pipeline for schema drift.')}
+## 4. Closed-Loop Remediation & Validation Gate
+{diag.get('remediation', '1. Trigger candidate retraining on recent distribution window.\n2. Execute 4-step validation gate before promotion.\n3. Inspect upstream ETL pipeline for schema drift.')}
 
 ---
 
-## 5. Algorithmic Telemetry Trace
-* **Ingestion Queue:** Circular FIFO Buffer ($O(1)$)
-* **Sliding Window:** Double-Ended Queue ($O(1)$ amortized)
-* **Baseline Registry:** In-Memory HashMap ($O(1)$)
-* **Alert Prioritization:** Binary Max-Heap ($O(\\log N)$)
-* **Dependency Topology:** 4-Layer Dynamic DAG ($O(V+E)$)
+## 5. Algorithmic Complexity & Telemetry Architecture
+* **Ingestion Queue:** Circular FIFO Buffer ($O(1)$ Enqueue / Dequeue)
+* **Sliding Window:** Double-Ended Queue ($O(1)$ Amortized Metric Compute)
+* **Baseline Registry:** In-Memory HashMap ($O(1)$ Average Model & Baseline Lookup)
+* **Statistical Drift Engine:** Kolmogorov-Smirnov ($O(N \\log N)$), PSI ($O(N + B)$)
+* **Alert Prioritization:** Binary Max-Heap ($O(\\log N)$ Push / Pop Max)
+* **Dependency Topology:** 4-Layer Dynamic DAG ($O(V+E)$ Reverse / Forward BFS)
 
 *Report automatically generated by ArgusML Observability Engine.*
 """
