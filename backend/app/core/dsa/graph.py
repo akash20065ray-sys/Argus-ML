@@ -255,3 +255,10 @@ class DependencyGraph:
             self.add_node(sid, "SERVICE", srv_name)
             self.add_edge(model_id, sid, "CONSUMES")
 
+    def clear(self):
+        """Clears all nodes and edges from the graph."""
+        with self.lock:
+            self.nodes.clear()
+            self.forward_adj.clear()
+            self.reverse_adj.clear()
+
