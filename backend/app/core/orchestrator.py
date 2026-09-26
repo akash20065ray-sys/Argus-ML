@@ -66,11 +66,16 @@ class ArgusSystem:
             )
         self.switch_active_model(sample_models[0].model_id)
 
-    def switch_active_model(self, model_id: str) -> bool:
+    def switch_active_model(self, model_id: Optional[str]) -> bool:
         """
         Switches the actively monitored model.
         Dynamically rebuilds DAG topology and resets sliding window.
+        If model_id is empty or None, unloads model and returns to standby state.
         """
+        if not model_id or model_id in ["", "none", "null", "STANDBY"]:
+            self.unload_active_model()
+            return True
+
         if model_id not in self.models_map:
             return False
 
@@ -98,6 +103,30 @@ class ArgusSystem:
             self.graph.build_topology_for_model(meta)
 
         return True
+
+    def unload_active_model(self):
+        """
+        Unloads the currently active model and returns the system to clean standby state.
+        """
+        self.active_model_id = None
+        if self.simulator:
+            self.simulator.stop()
+            self.simulator = None
+        self.sliding_window.clear()
+        self.alert_heap.clear()
+        self.latest_drift_results = {}
+        self.latest_diagnosis = None
+        self.events_since_drift_check = 0
+        self.graph.clear()
+
+    def clear_all_models(self):
+        """
+        Clears all registered models and baselines from the registry, returning to pristine startup state.
+        """
+        self.unload_active_model()
+        self.models_map.clear()
+        self.registry.clear()
+        self.queue.clear()
 
     def register_custom_model(
         self,

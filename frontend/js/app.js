@@ -18,7 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const modelSelect = document.getElementById('model-select');
   if (modelSelect) {
     modelSelect.addEventListener('change', (e) => {
-      selectModel(e.target.value);
+      const val = e.target.value;
+      if (!val || val === 'STANDBY' || val === 'none') {
+        unloadActiveModel();
+      } else {
+        selectModel(val);
+      }
     });
   }
 
@@ -108,11 +113,25 @@ function updateModelCatalog(models, activeMeta) {
   availableModels = models || [];
   const select = document.getElementById('model-select');
   const emptyHero = document.getElementById('empty-state-hero');
+  const btnUnload = document.getElementById('btn-unload-model');
+  const btnStripUnload = document.getElementById('btn-strip-unload');
 
   if (!activeMeta) {
     // Clean workspace state: No model is currently active
     if (emptyHero) emptyHero.style.display = 'block';
-    if (select) select.innerHTML = '<option value="">(No Model Active)</option>';
+    if (btnUnload) btnUnload.style.display = 'none';
+    if (btnStripUnload) btnStripUnload.style.display = 'none';
+
+    if (select) {
+      let optionsHtml = '<option value="">(No Model Active - Standby)</option>';
+      if (models && models.length > 0) {
+        optionsHtml += models
+          .map((m) => `<option value="${m.model_id}">${m.name} (${m.model_type})</option>`)
+          .join('');
+      }
+      select.innerHTML = optionsHtml;
+      select.value = '';
+    }
 
     const container = document.getElementById('feature-drift-buttons');
     if (container) {
@@ -127,28 +146,80 @@ function updateModelCatalog(models, activeMeta) {
       sysText.style.color = 'var(--text-muted)';
     }
 
+    // Reset metric cards & graphs to clean standby state
+    if (graphRenderer) {
+      graphRenderer.updateData({ nodes: {}, forward_adj: {}, reverse_adj: {} });
+    }
+    updateAlerts([], null);
+    updateDriftTable({});
+
+    const valPerf = document.getElementById('val-accuracy');
+    const deltaPerf = document.getElementById('delta-accuracy');
+    const valLat = document.getElementById('val-latency');
+    const deltaLat = document.getElementById('delta-latency');
+    const valDrift = document.getElementById('val-drift');
+    const deltaDrift = document.getElementById('delta-drift');
+    const valQueue = document.getElementById('val-queue');
+    const deltaQueue = document.getElementById('delta-queue');
+
+    if (valPerf) valPerf.textContent = '--%';
+    if (deltaPerf) { deltaPerf.className = 'metric-delta delta-good'; deltaPerf.textContent = 'Standby'; }
+    if (valLat) valLat.textContent = '-- ms';
+    if (deltaLat) { deltaLat.className = 'metric-delta delta-good'; deltaLat.textContent = 'Standby'; }
+    if (valDrift) { valDrift.textContent = 'Standby'; valDrift.style.color = 'var(--text-muted)'; }
+    if (deltaDrift) { deltaDrift.className = 'metric-delta delta-good'; deltaDrift.textContent = 'Distribution Inactive'; }
+    if (valQueue) valQueue.textContent = '0 / 5000';
+    if (deltaQueue) deltaQueue.textContent = 'Drops: 0 | Processed: 0';
+
     activeModelMeta = null;
     return;
   }
 
-  // A model is active: hide empty hero and populate catalog
+  // A model is active: hide empty hero and populate catalog with standby option
   if (emptyHero) emptyHero.style.display = 'none';
+  if (btnUnload) btnUnload.style.display = 'inline-block';
+  if (btnStripUnload) btnStripUnload.style.display = 'inline-block';
 
   if (select && models && models.length > 0) {
-    if (select.children.length !== models.length) {
-      select.innerHTML = models
-        .map((m) => `<option value="${m.model_id}">${m.name} (${m.model_type})</option>`)
-        .join('');
+    let optionsHtml = '<option value="">← Back to Home / Standby</option>';
+    optionsHtml += models
+      .map((m) => `<option value="${m.model_id}">${m.name} (${m.model_type})</option>`)
+      .join('');
+
+    if (select.innerHTML !== optionsHtml) {
+      select.innerHTML = optionsHtml;
     }
-    if (select.value !== activeMeta.model_id) {
-      select.value = activeMeta.model_id;
-    }
+    select.value = activeMeta.model_id;
   }
 
   // If active model changed, rebuild dynamic drift control buttons
   if (!activeModelMeta || activeModelMeta.model_id !== activeMeta.model_id) {
     activeModelMeta = activeMeta;
     renderDynamicDriftButtons(activeMeta);
+  }
+}
+
+async function unloadActiveModel() {
+  try {
+    await fetch(`${API_BASE}/api/models/unload`, { method: 'POST' });
+    activeModelMeta = null;
+    currentDiagnosis = null;
+    pollTelemetry();
+    showToast('Standby Mode', 'Returned to clean home standby screen.', 'info');
+  } catch (err) {
+    console.error('Error unloading active model:', err);
+  }
+}
+
+async function clearAllModels() {
+  try {
+    await fetch(`${API_BASE}/api/models/clear`, { method: 'POST' });
+    activeModelMeta = null;
+    currentDiagnosis = null;
+    pollTelemetry();
+    showToast('Workspace Cleared', 'All models unloaded and workspace reset.', 'info');
+  } catch (err) {
+    console.error('Error clearing workspace models:', err);
   }
 }
 

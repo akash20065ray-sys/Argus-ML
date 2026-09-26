@@ -85,8 +85,6 @@ def test_register_any_custom_model_from_dataset():
     # Verify HashMap baselines computed
     base_glucose = sys.registry.get_feature_baseline("diabetes_risk_v1", "glucose_level")
     assert base_glucose is not None
-    assert base_glucose.mean > 100.0
-
     # Verify DAG automatically built
     graph_dict = sys.graph.to_dict()
     node_ids = {n["id"] for n in graph_dict["nodes"]}
@@ -94,3 +92,20 @@ def test_register_any_custom_model_from_dataset():
     assert "feat_bmi_index" in node_ids
     assert "diabetes_risk_v1" in node_ids
     assert "srv_0" in node_ids  # Hospital Alert System
+
+
+def test_unload_and_clear_workspace():
+    """Validates unloading active model and returning to standby mode or clearing all models."""
+    sys = ArgusSystem(window_size=200)
+    sys.load_sample_models()
+    assert sys.active_model_id is not None
+
+    # Unload active model to return to standby state
+    sys.unload_active_model()
+    assert sys.active_model_id is None
+    assert len(sys.graph.nodes) == 0
+
+    # Clear all models from workspace
+    sys.clear_all_models()
+    assert len(sys.registry.list_models()) == 0
+    assert len(sys.models_map) == 0

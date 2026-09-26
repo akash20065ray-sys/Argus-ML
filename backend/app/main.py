@@ -143,6 +143,28 @@ def load_sample_models():
     }
 
 
+@app.post("/api/models/unload")
+def unload_model():
+    """Unloads active model and returns workspace to clean standby state."""
+    system.unload_active_model()
+    return {
+        "status": "SUCCESS",
+        "message": "Active model unloaded. Returned to standby state.",
+        "active_model_id": None,
+    }
+
+
+@app.post("/api/models/clear")
+def clear_all_models():
+    """Clears all models from registry and resets to pristine state."""
+    system.clear_all_models()
+    return {
+        "status": "SUCCESS",
+        "message": "All models cleared from workspace registry.",
+        "active_model_id": None,
+    }
+
+
 
 @app.post("/api/models/register")
 def register_custom_model_json(req: RegisterModelJsonRequest):

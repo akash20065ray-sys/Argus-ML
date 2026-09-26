@@ -184,3 +184,8 @@ class ModelRegistry:
     def list_models(self) -> List[Dict[str, Any]]:
         with self.lock:
             return [m.to_dict() for m in self.models.values()]
+
+    def clear(self):
+        """Clears all registered models and feature baselines."""
+        with self.lock:
+            self.models.clear()

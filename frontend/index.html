@@ -37,6 +37,11 @@
         </select>
       </div>
 
+      <!-- Unload / Return to Home Button -->
+      <button id="btn-unload-model" class="sim-btn" style="padding: 6px 14px; font-size: 0.78rem; color: var(--accent-cyan); border-color: rgba(56, 189, 248, 0.3); display: none;" onclick="unloadActiveModel()" title="Return to initial clean standby home screen">
+        ← Home / Standby
+      </button>
+
       <!-- Register Model Button -->
       <button id="btn-open-register" class="btn-primary-action">
         + Register Model (CSV)
@@ -71,6 +76,10 @@
 
       <button id="btn-reset" class="sim-btn reset-btn" onclick="resetTelemetry()">
         Reset Baseline
+      </button>
+
+      <button id="btn-strip-unload" class="sim-btn" style="color: var(--text-muted); border-color: rgba(255,255,255,0.12); display: none;" onclick="unloadActiveModel()" title="Unload active model and return to standby">
+        ← Return to Standby
       </button>
     </div>
   </section>

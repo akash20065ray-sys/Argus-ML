@@ -107,6 +107,20 @@ class EventQueue:
         with self.lock:
             return self.count
 
+    def get_size(self) -> int:
+        return self.size()
+
+    def clear(self):
+        """Clears all events in the queue."""
+        with self.lock:
+            self.buffer = [None] * self.capacity
+            self.head = 0
+            self.tail = 0
+            self.count = 0
+            self.dropped_events = 0
+            self.total_enqueued = 0
+            self.total_dequeued = 0
+
     def get_stats(self) -> Dict[str, Any]:
         """Returns runtime queue telemetry."""
         with self.lock:
