@@ -42,6 +42,12 @@
         ← Home / Standby
       </button>
 
+      <!-- Test History Drawer Opener -->
+      <button id="btn-open-history" class="sim-btn" style="padding: 6px 14px; font-size: 0.78rem; color: #fff; border-color: rgba(255, 255, 255, 0.2); display: flex; align-items: center; gap: 6px;" title="View testing sessions and past model diagnosis snapshots">
+        <span>📜 History</span>
+        <span id="history-badge-count" class="alert-badge badge-healthy" style="padding: 1px 6px; font-size: 0.68rem;">0</span>
+      </button>
+
       <!-- Register Model Button -->
       <button id="btn-open-register" class="btn-primary-action">
         + Register Model (CSV)
@@ -444,6 +450,133 @@
         </button>
         <button type="button" id="btn-rca-auto-retrain" class="submit-btn" style="width: auto; padding: 8px 18px; cursor: pointer;">
           Auto-Retrain Model
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drawer: Model Testing & Observability Session History -->
+  <div id="history-drawer-backdrop" class="history-drawer-backdrop">
+    <div class="history-drawer">
+      <div class="history-drawer-header">
+        <div>
+          <div class="history-drawer-title">
+            <span>📜 Testing &amp; Audit History</span>
+          </div>
+          <div class="history-drawer-subtitle">
+            Chronological log of model drift tests &amp; diagnoses
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button id="btn-clear-history" class="sim-btn" style="padding: 4px 10px; font-size: 0.72rem; color: var(--text-dim);" title="Clear history">
+            Clear
+          </button>
+          <button id="btn-close-history" class="close-btn" style="line-height: 1;">&times;</button>
+        </div>
+      </div>
+
+      <!-- History Filter Tabs -->
+      <div class="history-filter-strip">
+        <button class="history-filter-chip active" data-filter="ALL">All (<span id="count-filter-all">0</span>)</button>
+        <button class="history-filter-chip" data-filter="DRIFT">Drift (<span id="count-filter-drift">0</span>)</button>
+        <button class="history-filter-chip" data-filter="RETRAIN">Retrained (<span id="count-filter-retrain">0</span>)</button>
+        <button class="history-filter-chip" data-filter="REGISTER">Models (<span id="count-filter-register">0</span>)</button>
+      </div>
+
+      <!-- History Cards Container -->
+      <div id="history-list-container" class="history-list-body">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Historical Snapshot Inspection Modal -->
+  <div id="snapshot-modal-backdrop" class="modal-backdrop">
+    <div class="snapshot-modal">
+      <button id="snapshot-modal-close" class="close-btn">&times;</button>
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+        <div>
+          <h2 style="font-size: 1.25rem; font-weight: 700;">Historical Test Snapshot</h2>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+            Captured at <span id="snap-timestamp" style="color: #fff; font-family: var(--font-mono); font-weight: 600;">-</span> &bull; Session: <code id="snap-session-id" style="color: var(--accent-cyan);">-</code>
+          </div>
+        </div>
+        <span id="snap-event-badge" class="alert-badge badge-critical">DRIFT DETECTED</span>
+      </div>
+
+      <div style="display: flex; gap: 14px; margin-top: 10px; font-size: 0.82rem; color: var(--text-muted); flex-wrap: wrap;">
+        <div>Model: <strong id="snap-model-name" style="color: #fff;">-</strong> (<code id="snap-model-id" style="color: var(--accent-cyan);">-</code>)</div>
+        <div>Severity: <span id="snap-severity" style="font-weight: 700;">-</span></div>
+      </div>
+
+      <!-- Snapshot Graph Canvas Viewport -->
+      <div style="margin-top: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <span style="font-size: 0.76rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted);">
+            Topology State Snapshot (DAG):
+          </span>
+          <span style="font-size: 0.72rem; font-family: var(--font-mono); color: var(--text-dim);">
+            Reverse-BFS Culprit &amp; Forward-BFS Blast
+          </span>
+        </div>
+        <div class="snapshot-graph-viewport">
+          <canvas id="snapshot-graph-canvas"></canvas>
+        </div>
+      </div>
+
+      <!-- Snapshot Metrics & RCA Breakdown -->
+      <div id="snap-rca-breakdown" class="rca-culprit-banner" style="margin-top: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--accent-crimson);">
+            Root Cause Diagnosis
+          </div>
+          <span id="snap-confidence-badge" class="alert-badge badge-critical" style="font-size: 0.72rem;">-</span>
+        </div>
+        <div style="font-size: 1.05rem; font-family: var(--font-mono); font-weight: 700; color: #fff;">
+          Culprit: <span id="snap-culprit-feature" style="color: var(--accent-crimson);">-</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-family: var(--font-mono); font-size: 0.76rem; margin-top: 8px;">
+          <div style="background: rgba(0,0,0,0.35); padding: 6px 8px; border-radius: 5px;">
+            <div style="color: var(--text-dim); font-size: 0.65rem;">ACCURACY</div>
+            <div id="snap-accuracy" style="font-weight: 700; color: #fff;">-</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.35); padding: 6px 8px; border-radius: 5px;">
+            <div style="color: var(--text-dim); font-size: 0.65rem;">KS STATISTIC</div>
+            <div id="snap-ks-stat" style="font-weight: 700; color: #fff;">-</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.35); padding: 6px 8px; border-radius: 5px;">
+            <div style="color: var(--text-dim); font-size: 0.65rem;">PSI SCORE</div>
+            <div id="snap-psi-stat" style="font-weight: 700; color: #fff;">-</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.35); padding: 6px 8px; border-radius: 5px;">
+            <div style="color: var(--text-dim); font-size: 0.65rem;">MEAN SHIFT</div>
+            <div id="snap-shift-pct" style="font-weight: 700; color: #fff;">-</div>
+          </div>
+        </div>
+
+        <p id="snap-diagnosis-text" style="font-size: 0.8rem; color: #e2e8f0; margin-top: 8px; line-height: 1.4;"></p>
+      </div>
+
+      <!-- Snapshot Blast Radius -->
+      <div id="snap-blast-container" style="margin-top: 10px;">
+        <div style="font-size: 0.76rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">
+          Impacted Downstream Services (Blast Radius):
+        </div>
+        <div id="snap-blast-radius-list" class="rca-blast-list"></div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div style="margin-top: 18px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 12px;">
+        <button type="button" id="btn-snap-switch-model" class="sim-btn" style="color: var(--accent-cyan); border-color: rgba(56, 189, 248, 0.3); cursor: pointer;">
+          Switch Active Telemetry to this Model
+        </button>
+        <button type="button" id="btn-snap-download-report" class="sim-btn" style="color: #fff; border-color: rgba(255, 255, 255, 0.2); cursor: pointer;">
+          Download Incident Report (.md)
+        </button>
+        <button type="button" id="btn-snap-close" class="submit-btn" style="width: auto; padding: 7px 18px; cursor: pointer;">
+          Done
         </button>
       </div>
     </div>

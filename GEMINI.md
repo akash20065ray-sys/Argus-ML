@@ -52,13 +52,16 @@ This file is automatically loaded into memory across all sessions in this worksp
 
 ---
 
-## ⚡ Active Advanced Features (Phases 7 & 8)
+## ⚡ Active Advanced Features (Phases 7, 8 & 9)
 * **Phase 7: 1-Click Automated Model Retraining Trigger:**
   * Re-fits model on sliding window + baseline data, computes recovered accuracy/R², updates HashMap baseline distributions, bumps version (`v1.0.0` &rarr; `v1.1.0`), resolves alerts in Max-Heap, and resets node health to `HEALTHY`.
 * **Phase 8: Downloadable Markdown Incident Post-Mortem Report:**
   * Exports comprehensive incident post-mortem markdown report documenting root cause attribution, statistical drift indicators (KS/PSI), blast radius, and automated remediation logs.
+* **Phase 9: Model Testing & Observability Session History Drawer:**
+  * Chronological ChatGPT-style session audit drawer tracking all model tests, drift alerts, registrations, and retraining runs.
+  * 1-Click historical snapshot inspection with interactive DAG topology replays, metric states, and downloadable session post-mortems.
 
 ---
 
 ## ⏳ Optional Future Extension
-* **Phase 9:** Webhook notifications (Slack / Discord / PagerDuty / Email).
+* **Phase 10:** Webhook notifications (Slack / Discord / PagerDuty / Email).

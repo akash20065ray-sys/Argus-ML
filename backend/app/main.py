@@ -296,6 +296,37 @@ def get_incident_report(alert_id: str):
     return {"alert_id": alert_id, "report_markdown": report_md}
 
 
+@app.get("/api/history")
+def get_session_history(limit: int = 50):
+    """
+    Returns chronological model testing and observability session history logs.
+    """
+    return {
+        "status": "SUCCESS",
+        "count": len(system.history.history),
+        "history": system.history.get_history(limit),
+    }
+
+
+@app.get("/api/history/{session_id}")
+def get_session_details(session_id: str):
+    """
+    Returns full snapshot details, graph state, and diagnosis output for a specific test session.
+    """
+    rec = system.history.get_session(session_id)
+    if not rec:
+        raise HTTPException(status_code=404, detail="Test session record not found")
+    return {"status": "SUCCESS", "session": rec}
+
+
+@app.post("/api/history/clear")
+def clear_session_history():
+    """
+    Clears the test session history in memory.
+    """
+    system.history.clear()
+    return {"status": "SUCCESS", "message": "Test session history cleared"}
+
 
 # Serve static frontend files
 frontend_dir = os.path.abspath(

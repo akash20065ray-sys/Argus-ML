@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 from .dsa.deque import MetricSlidingWindow
 from .dsa.graph import DependencyGraph
 from .dsa.heap import AlertMaxHeap
+from .dsa.history import ModelTestingHistory
 from .dsa.queue import EventQueue
 from .dsa.registry import ModelMetadata, ModelRegistry
 from .drift.detector import DriftEngine
@@ -31,6 +32,7 @@ class ArgusSystem:
         self.alert_heap = AlertMaxHeap()
         self.graph = DependencyGraph()
         self.registry = ModelRegistry()
+        self.history = ModelTestingHistory(capacity=100)
 
         # 2. Analytical Engines
         self.drift_engine = DriftEngine(significance_level=0.05)
@@ -65,6 +67,14 @@ class ArgusSystem:
                 upstream_pipelines=m.upstream_pipelines,
             )
         self.switch_active_model(sample_models[0].model_id)
+        self.history.record_session(
+            model_id=sample_models[0].model_id,
+            model_name=sample_models[0].name,
+            event_type="DEMO_LOADED",
+            summary=f"Loaded 3 showcase demo models ({', '.join(m.name for m in sample_models)}).",
+            severity_level="HEALTHY",
+            graph_snapshot=self.graph.to_dict(),
+        )
 
     def switch_active_model(self, model_id: Optional[str]) -> bool:
         """
@@ -101,6 +111,14 @@ class ArgusSystem:
         # 3. Dynamically rebuild DAG topology for this model
         if meta:
             self.graph.build_topology_for_model(meta)
+            self.history.record_session(
+                model_id=model_id,
+                model_name=meta.name,
+                event_type="SWITCHED",
+                summary=f"Switched active telemetry to '{meta.name}' ({getattr(meta, 'version', 'v1.0.0')}).",
+                severity_level="HEALTHY",
+                graph_snapshot=self.graph.to_dict(),
+            )
 
         return True
 
@@ -178,6 +196,15 @@ class ArgusSystem:
 
         # Automatically switch to the newly registered model
         self.switch_active_model(model_id)
+
+        self.history.record_session(
+            model_id=model_id,
+            model_name=name,
+            event_type="REGISTERED",
+            summary=f"Registered custom model '{name}' with {len(features)} features and baseline distribution in HashMap.",
+            severity_level="HEALTHY",
+            graph_snapshot=self.graph.to_dict(),
+        )
         return meta
 
     def start(self):
@@ -244,6 +271,24 @@ class ArgusSystem:
         )
         if diagnosis:
             self.latest_diagnosis = diagnosis
+            rc = diagnosis.get("root_cause", {})
+            culprit = rc.get("culprit_feature", "Unknown")
+            conf = rc.get("confidence_score", 0.0)
+            sev = diagnosis.get("severity_level", "WARNING")
+            acc = perf_metrics.get("accuracy", 1.0)
+            summary = f"{sev}: Drift in '{culprit}' ({conf:.1f}% RCS confidence). Accuracy: {acc:.1%}"
+            self.history.record_session(
+                model_id=self.active_model_id,
+                model_name=model_meta.name,
+                event_type="DRIFT_DETECTED",
+                summary=summary,
+                accuracy=acc,
+                p99_latency_ms=perf_metrics.get("p99", 0.0),
+                culprit_feature=culprit,
+                severity_level=sev,
+                diagnosis_output=diagnosis,
+                graph_snapshot=self.graph.to_dict(),
+            )
 
     def get_dashboard_summary(self) -> Dict[str, Any]:
         perf = self.sliding_window.get_performance_metrics()
@@ -266,6 +311,7 @@ class ArgusSystem:
             "graph": graph_dict,
             "drift_summary": self.latest_drift_results,
             "latest_diagnosis": self.latest_diagnosis,
+            "session_history": self.history.get_history(35),
         }
 
     def reset_metrics(self):
@@ -379,6 +425,17 @@ class ArgusSystem:
         self.latest_diagnosis = None
         self.latest_drift_results = {}
         self.events_since_drift_check = 0
+
+        self.history.record_session(
+            model_id=self.active_model_id,
+            model_name=candidate.name,
+            event_type="RETRAINED",
+            summary=f"Retrained and promoted to {new_v}. Recovered {val_report.get('metric_name', 'Accuracy')}: {val_report.get('candidate_score', 0):.2%}",
+            accuracy=val_report.get("candidate_score"),
+            severity_level="HEALTHY",
+            diagnosis_output={"retraining_report": val_report},
+            graph_snapshot=self.graph.to_dict(),
+        )
 
         return {
             "status": "SUCCESS",
