@@ -146,9 +146,15 @@ function updateModelCatalog(models, activeMeta) {
       sysText.style.color = 'var(--text-muted)';
     }
 
+    const controlStrip = document.querySelector('.control-strip');
+    if (controlStrip) {
+      controlStrip.style.opacity = '0.35';
+      controlStrip.style.pointerEvents = 'none';
+    }
+
     // Reset metric cards & graphs to clean standby state
     if (graphRenderer) {
-      graphRenderer.updateData({ nodes: {}, forward_adj: {}, reverse_adj: {} });
+      graphRenderer.updateData({ nodes: [], forward_adj: {}, reverse_adj: {} });
     }
     updateAlerts([], null);
     updateDriftTable({});
@@ -179,6 +185,12 @@ function updateModelCatalog(models, activeMeta) {
   if (emptyHero) emptyHero.style.display = 'none';
   if (btnUnload) btnUnload.style.display = 'inline-block';
   if (btnStripUnload) btnStripUnload.style.display = 'inline-block';
+
+  const controlStrip = document.querySelector('.control-strip');
+  if (controlStrip) {
+    controlStrip.style.opacity = '1';
+    controlStrip.style.pointerEvents = 'auto';
+  }
 
   if (select && models && models.length > 0) {
     let optionsHtml = '<option value="">← Back to Home / Standby</option>';
@@ -247,6 +259,8 @@ function renderDynamicDriftButtons(meta) {
 }
 
 function updateMetrics(data) {
+  if (!activeModelMeta) return;
+
   const perf = data.performance || {};
   const lat = data.latency || {};
   const queue = data.queue_stats || {};
@@ -336,8 +350,12 @@ function updateMetrics(data) {
 }
 
 function updateGraph(graphData) {
-  if (graphRenderer && graphData) {
-    graphRenderer.updateData(graphData);
+  if (graphRenderer) {
+    if (activeModelMeta && graphData) {
+      graphRenderer.updateData(graphData);
+    } else {
+      graphRenderer.updateData({ nodes: [], forward_adj: {}, reverse_adj: {} });
+    }
   }
 }
 
@@ -345,6 +363,19 @@ function updateAlerts(alerts, diagnosis) {
   const container = document.getElementById('alerts-list-container');
   const badgeCount = document.getElementById('active-alert-count');
   const activeAlerts = (alerts || []).filter((a) => a.status === 'ACTIVE');
+
+  if (!activeModelMeta) {
+    badgeCount.textContent = '0 Incidents';
+    badgeCount.className = 'alert-badge badge-healthy';
+    container.innerHTML = `
+      <div style="text-align:center; padding: 40px 20px; color: var(--text-dim);">
+        <div style="font-size: 2rem; margin-bottom: 8px;">🛡️</div>
+        <div>Standby Mode</div>
+        <div style="font-size: 0.78rem; margin-top: 4px;">Max-Heap Priority Queue is idle</div>
+      </div>
+    `;
+    return;
+  }
 
   badgeCount.textContent = `${activeAlerts.length} Prioritized`;
 
@@ -390,6 +421,11 @@ function updateAlerts(alerts, diagnosis) {
 
 function updateDriftTable(driftSummary) {
   const tbody = document.getElementById('drift-table-body');
+  if (!activeModelMeta) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-dim); padding: 24px;">No active model. Register a model or select a demo to stream feature drift.</td></tr>`;
+    return;
+  }
+
   const evaluated = (driftSummary && driftSummary.evaluated_features) || {};
   const featureNames = Object.keys(evaluated);
 

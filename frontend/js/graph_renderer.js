@@ -78,7 +78,12 @@ class GraphRenderer {
   }
 
   updateData(graphData) {
-    if (!graphData || !graphData.nodes) return;
+    if (!graphData || !graphData.nodes || graphData.nodes.length === 0) {
+      this.nodes = [];
+      this.edges = [];
+      this.lastGraphData = null;
+      return;
+    }
     this.lastGraphData = graphData;
 
     // Categorize nodes into 4 topological layers
@@ -154,6 +159,11 @@ class GraphRenderer {
     // 1. Subtle background grid
     this.drawBackgroundGrid(ctx);
 
+    if (this.nodes.length === 0) {
+      this.drawStandbyState(ctx);
+      return;
+    }
+
     // 2. Draw DAG connection edges & animated signal packets
     this.edges.forEach((edge) => {
       if (edge.sourceNode && edge.targetNode) {
@@ -170,6 +180,18 @@ class GraphRenderer {
     if (this.hoveredNode) {
       this.drawTooltip(ctx, this.hoveredNode);
     }
+  }
+
+  drawStandbyState(ctx) {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#64748b';
+    ctx.font = '600 14px Inter, sans-serif';
+    ctx.fillText('⚡ Standby Mode — No Active Dependency Graph', this.width / 2, this.height / 2 - 10);
+    ctx.font = '400 12px Inter, sans-serif';
+    ctx.fillStyle = '#475569';
+    ctx.fillText('Register a model (CSV) or select a demo to generate dynamic topology.', this.width / 2, this.height / 2 + 14);
+    ctx.restore();
   }
 
   drawBackgroundGrid(ctx) {
