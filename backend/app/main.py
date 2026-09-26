@@ -6,6 +6,7 @@ Supports monitoring, drift analysis, DAG topologies, and RCA for ANY ML Model.
 from contextlib import asynccontextmanager
 import io
 import os
+import time
 from typing import Any, Dict, List, Optional
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -73,6 +74,24 @@ class RegisterModelJsonRequest(BaseModel):
     upstream_pipelines: Optional[List[str]] = None
     sla_min_accuracy: Optional[float] = 0.85
     sla_max_p99_latency_ms: Optional[float] = 200.0
+
+
+@app.post("/api/ingest")
+def ingest_event(req: IngestEventRequest):
+    """
+    Ingests a live prediction inference event into the circular FIFO EventQueue.
+    """
+    event = {
+        "model_id": req.model_id,
+        "features": req.features,
+        "prediction": req.prediction,
+        "confidence": req.confidence or 0.95,
+        "ground_truth": req.ground_truth,
+        "latency_ms": req.latency_ms or 45.0,
+        "timestamp": time.time(),
+    }
+    success = system.queue.enqueue(event)
+    return {"status": "ENQUEUED" if success else "DROPPED", "queue_size": system.queue.get_size()}
 
 
 @app.get("/api/health")
