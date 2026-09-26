@@ -75,6 +75,7 @@ def test_rca_engine_pinpoints_culprit_feature():
 
     assert diagnosis is not None
     assert diagnosis["root_cause"]["culprit_feature"] == "amount"
+    assert diagnosis["root_cause"]["confidence_score"] > 50.0
     assert diagnosis["severity_level"] == "CRITICAL"
     assert "Checkout Service (SERVICE)" in diagnosis["blast_radius"]
 
@@ -83,3 +84,63 @@ def test_rca_engine_pinpoints_culprit_feature():
     assert top_alert is not None
     assert top_alert.severity_level == "CRITICAL"
     assert top_alert.model_id == "model_fraud"
+
+
+def test_multi_candidate_rcs_confidence_ranking():
+    """Validates that RCA engine ranks multiple candidate features by RCS confidence score."""
+    graph = DependencyGraph()
+    alert_heap = AlertMaxHeap()
+
+    graph.add_node("feat_amt", "FEATURE", "Amount")
+    graph.add_node("feat_ip", "FEATURE", "IP Ratio")
+    graph.add_node("feat_age", "FEATURE", "Age")
+    graph.add_node("model_1", "MODEL", "Model 1")
+
+    graph.add_edge("feat_amt", "model_1")
+    graph.add_edge("feat_ip", "model_1")
+    graph.add_edge("feat_age", "model_1")
+
+    rca = RootCauseAnalysisEngine(graph, alert_heap)
+
+    mock_drift = {
+        "evaluated_features": {
+            "amt": {
+                "feature": "amt",
+                "ks_statistic": 0.52,
+                "psi": 0.44,
+                "mean_shift_pct": 310.0,
+                "drift_detected": True,
+            },
+            "ip": {
+                "feature": "ip",
+                "ks_statistic": 0.22,
+                "psi": 0.12,
+                "mean_shift_pct": 40.0,
+                "drift_detected": True,
+            },
+            "age": {
+                "feature": "age",
+                "ks_statistic": 0.04,
+                "psi": 0.02,
+                "mean_shift_pct": 2.0,
+                "drift_detected": False,
+            },
+        }
+    }
+
+    diagnosis = rca.diagnose_model(
+        model_id="model_1",
+        current_metrics={"accuracy": 0.70, "p99": 50.0},
+        sla_min_accuracy=0.85,
+        drift_results=mock_drift,
+    )
+
+    assert diagnosis is not None
+    candidates = diagnosis["candidate_root_causes"]
+    assert len(candidates) == 3
+
+    # Ensure ranked in descending order of RCS
+    assert candidates[0]["feature"] == "amt"
+    assert candidates[1]["feature"] == "ip"
+    assert candidates[2]["feature"] == "age"
+    assert candidates[0]["confidence_score"] > candidates[1]["confidence_score"] > candidates[2]["confidence_score"]
