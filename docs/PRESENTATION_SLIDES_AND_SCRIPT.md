@@ -66,12 +66,16 @@ Generated Artifacts in Downloads & Desktop:
 
 ---
 
-### 🎤 Slide 4: Literature Review (Existing Tools vs ArgusML)
+### 🎤 Slide 4: Literature Survey & Research Gap Analysis
 **Speaker: AKASH (Lead)**
-> *"As shown in our easy comparison table on Slide 4:*
-> * *Traditional Server Tools (Datadog) only check server uptime, not data drift.*
-> * *Offline Python Tools (Evidently) only run hours later on saved CSV files.*
-> * *ArgusML works **live on streaming data**, catches data changes in **under 0.45 milliseconds**, automatically traces data connections to find the bad feature, and provides a **1-click auto-fix** without requiring any paid cloud tools."*
+> *"On Slide 4, we conducted a systematic Literature Survey of foundational research papers in ML monitoring:*
+> 1. *Sculley et al. (NeurIPS 2015) proved that 95% of production ML is technical debt and monitoring glue code, but did not provide an in-memory automated solution.*
+> 2. *Shimodaira (2000) and Gama et al. (2014) formalized covariate shift and concept drift equations, but their models remained theoretical without live microservice integration.*
+> 3. *Breck et al. (SysML 2019) introduced data validation, but it relies on slow offline batch jobs with multi-hour delays.*
+> 4. *Rabanser & Lipton (NeurIPS 2019) evaluated statistical tests (KS-Test/PSI), but tested them in isolation on static datasets without upstream graph root-cause isolation.*
+> 5. *Existing tools like EvidentlyAI and WhyLogs operate as offline batch profilers lacking dynamic graph lineage, priority alert heaps, and closed-loop retraining.*
+> 
+> *ArgusML addresses these gaps by combining real-time in-memory statistical drift testing with 4-layer dependency graph Reverse-BFS and automated retraining."*
 
 ---
 

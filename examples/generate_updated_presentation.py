@@ -304,36 +304,57 @@ def create_presentation():
             p.space_before = Pt(2)
 
     # =============================================================
-    # SLIDE 4: Literature Review (Simple Plain Language Table)
+    # SLIDE 4: Literature Survey & Research Gap Analysis Table
     # =============================================================
     s4 = prs.slides.add_slide(blank_layout)
     add_bg(s4)
-    add_header(s4, "LITERATURE REVIEW: EXISTING TOOLS VS ARGUSML", "EASY COMPARISON TABLE")
+    add_header(s4, "LITERATURE SURVEY & RESEARCH GAP ANALYSIS", "SURVEY OF KEY RESEARCH PAPERS & IDENTIFIED LIMITATIONS")
 
-    tbl_shape4 = s4.shapes.add_table(9, 5, Inches(0.8), Inches(1.7), Inches(11.73), Inches(5.2))
+    tbl_shape4 = s4.shapes.add_table(6, 4, Inches(0.8), Inches(1.7), Inches(11.73), Inches(5.2))
     tbl4 = tbl_shape4.table
-    tbl4.columns[0].width = Inches(2.2)
-    tbl4.columns[1].width = Inches(2.3)
-    tbl4.columns[2].width = Inches(2.4)
-    tbl4.columns[3].width = Inches(2.1)
-    tbl4.columns[4].width = Inches(2.73)
+    tbl4.columns[0].width = Inches(2.5)
+    tbl4.columns[1].width = Inches(3.0)
+    tbl4.columns[2].width = Inches(3.2)
+    tbl4.columns[3].width = Inches(3.03)
 
-    lit_headers = ["What It Does", "Server Tools (Datadog)", "Offline Tools (Evidently)", "Data Loggers (WhyLogs)", "ArgusML (Our Project)"]
+    lit_headers = ["Research Paper & Authors", "Core Contribution / Findings", "Identified Research Gap (Limitations)", "ArgusML Innovation (Our Solution)"]
     lit_rows = [
-        ["What It Monitors", "Server CPU & RAM only", "Saved CSV files on disk", "Summary numbers only", "Live Predictions + Data Drift + Graph"],
-        ["Processing Speed", "Slow background lag", "Slow batch delay (>100ms)", "Fast summaries (<2ms)", "Super Fast In-Memory (<0.45 ms)"],
-        ["Catches Data Drift?", "No (Blind to data changes)", "Only offline on saved files", "Approximate guesses", "Yes, in Real-Time on Live Data"],
-        ["Finds Bad Feature?", "No (Manual guessing)", "No (No pipeline map)", "No", "Yes, Auto-traces connections O(V+E)"],
-        ["Alert Prioritization", "Floods user with all alerts", "None", "None", "Smart Priority Queue (Most urgent first)"],
-        ["Auto-Fix & Retrain?", "No, manual coding only", "No", "No", "1-Click Auto-Retrain with Zero Downtime"],
-        ["Extra Setup Needed", "Heavy paid cloud software", "Heavy disk & file storage", "Java / Cloud SDKs", "Zero Extra Tools (Pure Python & DSA)"],
-        ["Runs In Real-Time?", "Only server uptime", "No (Runs after hours)", "Streaming summaries", "Yes (Real-time live watchdog)"]
+        [
+            "Sculley et al. (NeurIPS 2015)\n'Hidden Technical Debt in ML Systems'",
+            "• Proved ML code is <5% of production systems.\n• Over 95% is glue code, pipelines & monitoring debt.",
+            "• Highlighted technical debt conceptually.\n• Did not provide an automated in-memory monitoring engine or graph root-cause tool.",
+            "• Pure in-memory 5-DSA platform eliminating 95% glue code with zero external infrastructure."
+        ],
+        [
+            "Shimodaira (2000) / Gama et al. (2014)\n'Covariate Shift & Concept Drift Survey'",
+            "• Formalized mathematical shift in input distributions: P(X) != P_base(X).\n• Defined sudden and gradual drift models.",
+            "• Purely theoretical distribution models.\n• Did not connect statistical drift to live production microservices or causal topology.",
+            "• Connected real-time KS/PSI drift testing directly with live production traffic and 4-layer dependency graphs."
+        ],
+        [
+            "Breck et al. (SysML 2019)\n'Data Validation for Machine Learning'",
+            "• Proposed schema and basic data quality verification for production pipelines.",
+            "• Runs offline in slow batch jobs (hours of delay).\n• Cannot detect silent statistical drift on streaming live predictions (<1 ms).",
+            "• Ultra-low latency in-memory watchdog checking drift in under 0.45 ms on live streaming predictions."
+        ],
+        [
+            "Rabanser, Günnemann, Lipton (NeurIPS 2019)\n'Failing Loudly: Detecting Dataset Shift'",
+            "• Evaluated 2-sample statistical tests (KS-Test, PSI, MMD) for detecting feature shifts.",
+            "• Tested statistical metrics in isolation on static files.\n• Lacked upstream graph root-cause isolation and automated retraining.",
+            "• Integrated KS/PSI testing with Reverse-BFS graph traversal to pinpoint the exact corrupted upstream feature and auto-retrain."
+        ],
+        [
+            "Evidently AI / WhyLogs (2022–2023)\n'MLOps Profilers & Statistical Logging'",
+            "• Built open-source tools for generating data distribution summaries and HTML reports.",
+            "• Operates as offline batch scripts.\n• Lacks dynamic graph causal attribution, priority alert queues, and closed-loop self-healing.",
+            "• Dynamic 4-Layer DAG + Binary Max-Heap priority queue + 1-Click automated closed-loop model retraining."
+        ]
     ]
 
     for c_idx, h in enumerate(lit_headers):
         cell = tbl4.cell(0, c_idx)
         cell.fill.solid()
-        cell.fill.fore_color.rgb = BORDER_CRIMSON if c_idx == 4 else BG_CARD_ALT
+        cell.fill.fore_color.rgb = BORDER_CRIMSON if c_idx == 3 else BG_CARD_ALT
         cell.vertical_anchor = MSO_ANCHOR.MIDDLE
         p = cell.text_frame.paragraphs[0]
         p.text = h
@@ -341,7 +362,7 @@ def create_presentation():
         p.font.name = "Arial"
         p.font.size = Pt(11)
         p.font.bold = True
-        p.font.color.rgb = TEXT_GOLD if c_idx == 4 else TEXT_WHITE
+        p.font.color.rgb = TEXT_GOLD if c_idx == 3 else TEXT_WHITE
 
     for r_idx, row in enumerate(lit_rows):
         r_bg = BG_CARD if r_idx % 2 == 0 else BG_CARD_ALT
@@ -352,17 +373,20 @@ def create_presentation():
             cell.vertical_anchor = MSO_ANCHOR.MIDDLE
             p = cell.text_frame.paragraphs[0]
             p.text = val
-            p.alignment = PP_ALIGN.CENTER if c_idx != 0 else PP_ALIGN.LEFT
+            p.alignment = PP_ALIGN.LEFT
             p.font.name = "Calibri"
-            p.font.size = Pt(10.2)
-            if c_idx == 4:
+            p.font.size = Pt(9.5)
+            if c_idx == 3:
                 p.font.bold = True
                 p.font.color.rgb = TEXT_GREEN
             elif c_idx == 0:
                 p.font.bold = True
                 p.font.color.rgb = TEXT_GOLD
+            elif c_idx == 2:
+                p.font.color.rgb = TEXT_CRIMSON
             else:
                 p.font.color.rgb = TEXT_OFFWHITE
+
 
     # =============================================================
     # SLIDE 5: Proposed Solution (Simple Plain Language)
@@ -1092,6 +1116,8 @@ def create_presentation():
     docs_path = os.path.abspath("docs")
 
     save_targets = [
+        os.path.join(downloads_path, "ArgusML_Latest_Presentation.pptx"),
+        os.path.join(downloads_path, "ArgusML_LitReview_Presentation.pptx"),
         os.path.join(downloads_path, "ArgusML_Simple_Presentation.pptx"),
         os.path.join(downloads_path, "ArgusML_Final_Presentation.pptx"),
         os.path.join(desktop_path, "ArgusML_Final_Presentation.pptx"),
@@ -1099,6 +1125,7 @@ def create_presentation():
         os.path.join(downloads_path, "ArgusML_Presentation.pptx"),
         os.path.join(desktop_path, "ArgusML_Presentation.pptx"),
     ]
+
 
     for target in save_targets:
         try:
