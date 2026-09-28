@@ -44,48 +44,51 @@ Generated Artifacts in Downloads & Desktop:
 
 ### 🎤 Slide 1 & 2: Title & Team Members
 **Speaker: AKASH (Lead)**
-> *"Respected guide Prof. Sheela and honorable panel members, good morning. Today, our team — Group 9 — is presenting **ArgusML**: A Universal Production AI Observability and Graph-Powered Root Cause Diagnostic Platform built upon 5 foundational Data Structures and Algorithms.*
+> *"Respected guide Prof. Sheela and honorable panel members, good morning. Today, our team — Group 9 — is presenting **ArgusML**: A Real-Time Health Watchdog and Root-Cause Diagnostic Platform for Machine Learning Models, built from scratch using 5 foundational Data Structures and Algorithms.*
 > 
 > *Our team members are Ghansham (Roll No. 4), Krishna (Roll No. 7), myself Akash (Roll No. 9), Sanskar (Roll No. 38), and Hari (Roll No. 49).*
 > 
-> *Let us begin with the critical industry problem that motivated our project."*
+> *Let us explain the real-world problem that motivated our project in simple terms."*
 
 ---
 
-### 🎤 Slide 3: Problem Statement & Industry Motivation
+### 🎤 Slide 3: Problem Statement (Why AI Models Break Silently)
 **Speaker: AKASH (Lead)**
-> *"Unlike traditional software services that fail loudly with runtime crashes or explicit HTTP 500 status codes, deployed Machine Learning (ML) models fail silently.*
+> *"In regular software development, when a bug happens, the server crashes loudly with an error code like HTTP 500.*
 > 
-> *When live streaming customer data experiences covariate shift or concept drift, the inference microservice continues returning HTTP 200 OK with valid prediction floats. However, the underlying mapping between input features and target labels collapses, causing silent multi-million dollar revenue losses.*
+> *However, **AI models break silently**:*
+> 1. *When customer habits or incoming data change, the model keeps running and returns `HTTP 200 OK`. But its predictions become completely wrong, dropping real-world accuracy from 95% down to 65% without anyone noticing.*
+> 2. *Existing tools like Datadog or Prometheus only check CPU and RAM — they cannot see if incoming data has drifted.*
+> 3. *Because data flows through huge multi-step pipelines, when an app fails, engineers take days manually querying databases to guess which feature broke.*
+> 4. *Existing tools only send alert emails; they don't fix the model, leading to costly downtime.*
 > 
-> *Furthermore, traditional APM tools like Datadog or Prometheus only monitor CPU and RAM — they are mathematically blind to statistical distribution drift. When a model decays, data engineering teams spend days manually writing SQL queries across multi-table ETL graphs to isolate the culprit feature.*
-> 
-> *ArgusML was engineered to solve this silent failure mode in real time."*
+> *ArgusML was built to catch these data changes instantly and fix the model automatically."*
 
 ---
 
-### 🎤 Slide 4: Literature Review & Comparative Taxonomy
+### 🎤 Slide 4: Literature Review (Existing Tools vs ArgusML)
 **Speaker: AKASH (Lead)**
-> *"As shown in our Literature Review Taxonomy on Slide 4, modern monitoring frameworks remain divided:*
-> 1. *Traditional APMs (Datadog, Prometheus) monitor system health but have zero statistical drift detection and no ML DAG topology.*
-> 2. *Offline Batch Profilers (EvidentlyAI, Great Expectations) calculate statistical profiles but operate out-of-band on static files, lack dynamic DAG awareness, and cannot triage alerts in real time.*
-> 3. *ArgusML unites real-time statistical hypothesis testing (KS-test and PSI) with a 4-layer dynamic dependency DAG and a binary max-heap priority queue, executing entirely in-memory with sub-0.45 ms latency."*
+> *"As shown in our easy comparison table on Slide 4:*
+> * *Traditional Server Tools (Datadog) only check server uptime, not data drift.*
+> * *Offline Python Tools (Evidently) only run hours later on saved CSV files.*
+> * *ArgusML works **live on streaming data**, catches data changes in **under 0.45 milliseconds**, automatically traces data connections to find the bad feature, and provides a **1-click auto-fix** without requiring any paid cloud tools."*
 
 ---
 
-### 🎤 Slide 5 & 6: Proposed Solution & System Architecture
+### 🎤 Slide 5 & 6: Our Solution & System Architecture
 **Speaker: AKASH (Lead)**
-> *"ArgusML introduces 6 core architectural innovations:*
-> 1. *A Pure In-Memory DSA Core executing in under 0.45 ms overhead.*
-> 2. *A Real-Time Statistical Drift Engine running KS and PSI tests every 25 streaming events.*
-> 3. *Topological Root Cause Attribution isolating corrupted features via Reverse-BFS in $O(V+E)$ time.*
-> 4. *A Binary Max-Heap Queue prioritizing active incidents in $O(\log N)$ time.*
-> 5. *A 4-Step Closed-Loop Retraining Validation Gate promoting recovered models with zero downtime.*
-> 6. *A Chronological Session Audit Drawer with 1-click historical snapshot replay and downloadable post-mortems.*
+> *"ArgusML solves this using 6 simple, powerful capabilities:*
+> 1. *An Ultra-Fast In-Memory Engine that runs in under 0.45 ms using less than 12 MB of RAM.*
+> 2. *A Live Drift Watchdog that checks incoming data against baseline numbers every 25 predictions.*
+> 3. *An Automatic Root-Cause Finder that climbs backward up the pipeline graph to pinpoint the exact corrupted feature.*
+> 4. *Smart Priority Alerts that sort issues by real urgency so engineers see the most critical problems first.*
+> 5. *1-Click Auto-Retraining that updates the model to version 1.1 with zero downtime.*
+> 6. *A Timeline History Drawer with 1-click historical replay and downloadable post-mortems.*
 > 
-> *As shown in our 5-Layer Master Pipeline on Slide 6, live inference traffic enters the Ingestion Buffer, updates the Rolling Telemetry Window, triggers the Statistical Drift Engine, traverses the Dependency Graph, and populates the Priority Alert Heap.*
+> *On Slide 6, you can see how data flows step-by-step: from the Ingestion Queue into the Recent Predictions Window, through the Drift Checker, across the Connection Graph, and into the Priority Alert Heap.*
 > 
-> *I will now hand over to Krishna to present the DSA Foundations and the Ingestion/Drift modules."*
+> *I will now hand over to Krishna to explain the Ingestion Queue and Drift Checker."*
+
 
 ---
 

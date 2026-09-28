@@ -90,7 +90,7 @@ def create_presentation():
         line.line.fill.background()
 
     # =============================================================
-    # SLIDE 1: Title Slide (Exact Crimson Orbit Format)
+    # SLIDE 1: Title Slide (Simple Plain Language)
     # =============================================================
     s1 = prs.slides.add_slide(blank_layout)
     add_bg(s1)
@@ -125,19 +125,19 @@ def create_presentation():
     p_t1.font.color.rgb = BORDER_CRIMSON
 
     p_t2 = tf_t.add_paragraph()
-    p_t2.text = "Universal Production AI Observability & Graph-Powered Root Cause Diagnostics"
+    p_t2.text = "Real-Time Health Watchdog & Root-Cause Tracker for AI Models"
     p_t2.alignment = PP_ALIGN.CENTER
     p_t2.font.name = "Arial"
-    p_t2.font.size = Pt(17)
+    p_t2.font.size = Pt(18)
     p_t2.font.bold = True
     p_t2.font.color.rgb = TEXT_WHITE
     p_t2.space_before = Pt(4)
 
     p_t3 = tf_t.add_paragraph()
-    p_t3.text = "An in-memory observability platform built upon 5 foundational data structures for continuous drift detection, reverse DAG attribution, max-heap incident prioritization, and automated model retraining."
+    p_t3.text = "A fast in-memory system that monitors live machine learning models, catches silent data changes, finds the exact broken feature using graphs, and fixes accuracy automatically with zero downtime."
     p_t3.alignment = PP_ALIGN.CENTER
     p_t3.font.name = "Calibri"
-    p_t3.font.size = Pt(13)
+    p_t3.font.size = Pt(13.5)
     p_t3.font.color.rgb = TEXT_MUTED
     p_t3.space_before = Pt(8)
 
@@ -177,35 +177,28 @@ def create_presentation():
     tb_bot = s1.shapes.add_textbox(Inches(1.0), Inches(6.1), Inches(11.33), Inches(0.8))
     tf_b = tb_bot.text_frame
     p_b = tf_b.paragraphs[0]
-    p_b.text = "28/09/2026   •   Core Engine: 5 Foundational Data Structures   •   Platform: Python & FastAPI"
+    p_b.text = "28/09/2026   •   Built with 5 Core Data Structures   •   Platform: Python & FastAPI"
     p_b.alignment = PP_ALIGN.CENTER
     p_b.font.name = "Calibri"
     p_b.font.size = Pt(12)
     p_b.font.color.rgb = TEXT_DIM
 
     # =============================================================
-    # SLIDE 2: Team Members Table (Exact Crimson Orbit Format)
+    # SLIDE 2: Team Members Table
     # =============================================================
     s2 = prs.slides.add_slide(blank_layout)
     add_bg(s2)
     add_header(s2, "TEAM MEMBERS", "VISHWAKARMA INSTITUTE OF TECHNOLOGY, PUNE • GROUP - 9")
 
-    # Table Card Container
     table_card = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.2), Inches(1.8), Inches(10.93), Inches(4.8))
     table_card.fill.solid()
     table_card.fill.fore_color.rgb = BG_CARD
     table_card.line.color.rgb = BORDER_CRIMSON
     table_card.line.width = Pt(1.5)
 
-    # Create Table
     rows = 6
     cols = 3
-    left = Inches(1.5)
-    top = Inches(2.1)
-    width = Inches(10.33)
-    height = Inches(4.0)
-
-    tbl_shape = s2.shapes.add_table(rows, cols, left, top, width, height)
+    tbl_shape = s2.shapes.add_table(rows, cols, Inches(1.5), Inches(2.1), Inches(10.33), Inches(4.0))
     tbl = tbl_shape.table
     tbl.columns[0].width = Inches(2.0)
     tbl.columns[1].width = Inches(5.33)
@@ -250,36 +243,36 @@ def create_presentation():
                 p.font.bold = True
 
     # =============================================================
-    # SLIDE 3: Problem Statement (Complete 1-Page Problem Statement)
+    # SLIDE 3: Problem Statement (Simple Plain Language)
     # =============================================================
     s3 = prs.slides.add_slide(blank_layout)
     add_bg(s3)
-    add_header(s3, "PROBLEM STATEMENT & INDUSTRY MOTIVATION", "CRITICAL MLOPS BOTTLENECK IN PRODUCTION")
+    add_header(s3, "THE PROBLEM: WHY AI MODELS BREAK SILENTLY", "REAL-WORLD MLOPS CHALLENGE")
 
     card_coords = [
-        (Inches(0.8), Inches(1.7), Inches(5.6), Inches(2.4), "1. The Silent Failure Problem in ML", BORDER_CRIMSON, [
-            ("• Zero Crash Visibility:", True, TEXT_CRIMSON),
-            ("  Unlike traditional code that throws HTTP 500 errors, degraded models return HTTP 200 OK with valid float vectors while predictions become completely erroneous.", False, TEXT_MUTED),
-            ("• Silent Business Decay:", True, TEXT_OFFWHITE),
-            ("  Covariate shift and concept drift silently erode revenue and risk models (fraud, loan approval, churn) for weeks before human detection.", False, TEXT_MUTED)
+        (Inches(0.8), Inches(1.7), Inches(5.6), Inches(2.4), "1. AI Models Fail Silently", BORDER_CRIMSON, [
+            ("• Normal Code vs AI Models:", True, TEXT_CRIMSON),
+            ("  Normal software crashes with a red error screen (HTTP 500). But broken AI models keep saying 'Everything is OK' (HTTP 200) while giving completely wrong predictions!", False, TEXT_MUTED),
+            ("• Silent Business Loss:", True, TEXT_OFFWHITE),
+            ("  Real-world changes (changing user habits, currency errors, sensor glitches) secretly drop model accuracy from 95% down to 65% without anyone noticing.", False, TEXT_MUTED)
         ]),
-        (Inches(6.93), Inches(1.7), Inches(5.6), Inches(2.4), "2. Traditional APM Blindness", BORDER_GOLD, [
-            ("• Datadog / Prometheus Limitations:", True, TEXT_GOLD),
-            ("  Industry APMs monitor CPU, RAM, network I/O, and status codes. They are mathematically blind to statistical distribution drift.", False, TEXT_MUTED),
-            ("• 95% Technical Debt (Sculley et al.):", True, TEXT_OFFWHITE),
-            ("  ML code is <5% of production codebases; 95% is glue code, pipelines, and monitoring infrastructure.", False, TEXT_MUTED)
+        (Inches(6.93), Inches(1.7), Inches(5.6), Inches(2.4), "2. Standard Server Tools Are Blind", BORDER_GOLD, [
+            ("• Datadog & Prometheus Limitations:", True, TEXT_GOLD),
+            ("  Traditional tools only check if the computer CPU and RAM are running. They are completely blind to whether the data itself has changed.", False, TEXT_MUTED),
+            ("• Invisible Data Changes:", True, TEXT_OFFWHITE),
+            ("  A model can have 100% server uptime and zero crashes, but still make 100% wrong decisions because input data drifted.", False, TEXT_MUTED)
         ]),
-        (Inches(0.8), Inches(4.35), Inches(5.6), Inches(2.55), "3. Topological Blindness & SRE Fatigue", BORDER_CYAN, [
-            ("• Multi-Table ETL Complexity:", True, TEXT_CYAN),
-            ("  Production data flows across complex graphs: Pipelines -> Features -> Model -> Downstream Services. When a model fails, root-cause tracing is manual.", False, TEXT_MUTED),
-            ("• Multi-Day Debugging Delays:", True, TEXT_OFFWHITE),
-            ("  Engineers spend days writing manual SQL queries to locate which specific upstream feature or pipeline was corrupted.", False, TEXT_MUTED)
+        (Inches(0.8), Inches(4.35), Inches(5.6), Inches(2.55), "3. Finding the Bad Feature Takes Days", BORDER_CYAN, [
+            ("• Complex Multi-Step Pipelines:", True, TEXT_CYAN),
+            ("  Data flows through many steps: Data Sources -> Features -> AI Model -> Apps. When an app fails, nobody knows which specific feature caused it.", False, TEXT_MUTED),
+            ("• Manual Searching Wastes Time:", True, TEXT_OFFWHITE),
+            ("  Engineers spend days manually checking database tables to guess which feature broke.", False, TEXT_MUTED)
         ]),
-        (Inches(6.93), Inches(4.35), Inches(5.6), Inches(2.55), "4. Lack of Closed-Loop Self-Healing", BORDER_GREEN, [
-            ("• Disconnected Alert-Only Tools:", True, TEXT_GREEN),
-            ("  Current tools only trigger email/Slack alerts without providing remediation pathways or rollback capabilities.", False, TEXT_MUTED),
-            ("• Heavy Human Downtime:", True, TEXT_OFFWHITE),
-            ("  Retraining requires manual data extraction, offline validation, and redeployment, leaving degraded models serving live traffic.", False, TEXT_MUTED)
+        (Inches(6.93), Inches(4.35), Inches(5.6), Inches(2.55), "4. Fixing Models Is Slow & Manual", BORDER_GREEN, [
+            ("• Alerts Without Solutions:", True, TEXT_GREEN),
+            ("  Existing tools only send alert emails, but don't help engineers fix the issue or retrain the model.", False, TEXT_MUTED),
+            ("• Expensive Downtime:", True, TEXT_OFFWHITE),
+            ("  Fixing models requires manual coding, manual testing, and manual redeployment, leaving broken models running for days.", False, TEXT_MUTED)
         ]),
     ]
 
@@ -311,31 +304,30 @@ def create_presentation():
             p.space_before = Pt(2)
 
     # =============================================================
-    # SLIDE 4: Literature Review in Table Format
+    # SLIDE 4: Literature Review (Simple Plain Language Table)
     # =============================================================
     s4 = prs.slides.add_slide(blank_layout)
     add_bg(s4)
-    add_header(s4, "LITERATURE REVIEW & COMPARATIVE TAXONOMY", "SYSTEMATIC SURVEY OF ML OBSERVABILITY & APM ARCHITECTURES")
+    add_header(s4, "LITERATURE REVIEW: EXISTING TOOLS VS ARGUSML", "EASY COMPARISON TABLE")
 
-    # Table Shape
     tbl_shape4 = s4.shapes.add_table(9, 5, Inches(0.8), Inches(1.7), Inches(11.73), Inches(5.2))
     tbl4 = tbl_shape4.table
-    tbl4.columns[0].width = Inches(2.33)
-    tbl4.columns[1].width = Inches(2.2)
+    tbl4.columns[0].width = Inches(2.2)
+    tbl4.columns[1].width = Inches(2.3)
     tbl4.columns[2].width = Inches(2.4)
-    tbl4.columns[3].width = Inches(2.2)
-    tbl4.columns[4].width = Inches(2.6)
+    tbl4.columns[3].width = Inches(2.1)
+    tbl4.columns[4].width = Inches(2.73)
 
-    lit_headers = ["Capability / Metric", "Traditional APM (Datadog/Prometheus)", "Offline Profilers (Evidently / Great Exp.)", "Data Logging (WhyLogs)", "ArgusML (Proposed Platform)"]
+    lit_headers = ["What It Does", "Server Tools (Datadog)", "Offline Tools (Evidently)", "Data Loggers (WhyLogs)", "ArgusML (Our Project)"]
     lit_rows = [
-        ["Telemetry Scope", "System Only (CPU/RAM)", "Batch Distributions", "Approximate Sketches", "System + ML + 4-Layer DAG"],
-        ["Streaming Overhead", "High Agent Overhead", "Batch Delay (>100ms)", "Low (<2ms)", "Ultra-Low (<0.45 ms)"],
-        ["Drift Detection", "None (Blind to Drift)", "Offline Static Files", "Approximate Profiles", "Real-Time KS-Test & PSI"],
-        ["Causal Topology", "Static Infrastructure Map", "None (No Graph Awareness)", "None", "Dynamic 4-Layer DAG"],
-        ["Root Cause Attribution", "None (Manual SRE)", "None", "None", "Reverse-BFS Traversal O(V+E)"],
-        ["Incident Triage", "Flat Unsorted Alerts", "None", "None", "Binary Max-Heap O(log N)"],
-        ["Remediation Gate", "None", "None", "None", "Closed-Loop 4-Step Gate"],
-        ["Dependencies", "Heavy SaaS Daemon", "Disk / Python Heavy", "Java / Cloud SDK", "100% In-Process Pure DSA Core"]
+        ["What It Monitors", "Server CPU & RAM only", "Saved CSV files on disk", "Summary numbers only", "Live Predictions + Data Drift + Graph"],
+        ["Processing Speed", "Slow background lag", "Slow batch delay (>100ms)", "Fast summaries (<2ms)", "Super Fast In-Memory (<0.45 ms)"],
+        ["Catches Data Drift?", "No (Blind to data changes)", "Only offline on saved files", "Approximate guesses", "Yes, in Real-Time on Live Data"],
+        ["Finds Bad Feature?", "No (Manual guessing)", "No (No pipeline map)", "No", "Yes, Auto-traces connections O(V+E)"],
+        ["Alert Prioritization", "Floods user with all alerts", "None", "None", "Smart Priority Queue (Most urgent first)"],
+        ["Auto-Fix & Retrain?", "No, manual coding only", "No", "No", "1-Click Auto-Retrain with Zero Downtime"],
+        ["Extra Setup Needed", "Heavy paid cloud software", "Heavy disk & file storage", "Java / Cloud SDKs", "Zero Extra Tools (Pure Python & DSA)"],
+        ["Runs In Real-Time?", "Only server uptime", "No (Runs after hours)", "Streaming summaries", "Yes (Real-time live watchdog)"]
     ]
 
     for c_idx, h in enumerate(lit_headers):
@@ -373,48 +365,48 @@ def create_presentation():
                 p.font.color.rgb = TEXT_OFFWHITE
 
     # =============================================================
-    # SLIDE 5: Proposed Solution & Novelty
+    # SLIDE 5: Proposed Solution (Simple Plain Language)
     # =============================================================
     s5 = prs.slides.add_slide(blank_layout)
     add_bg(s5)
-    add_header(s5, "PROPOSED SOLUTION & ARCHITECTURAL NOVELTY", "ARGUSML: IN-MEMORY GRAPH-POWERED OBSERVABILITY")
+    add_header(s5, "OUR SOLUTION: 6 WAYS ARGUSML FIXES THIS", "HOW ARGUSML SOLVES THE PROBLEM")
 
     sol_cards = [
-        (Inches(0.8), Inches(1.7), Inches(3.64), Inches(2.4), "1. Pure In-Memory DSA Core", BORDER_CRIMSON, [
-            "• Zero third-party vendor bloat or external brokers.",
-            "• Built entirely from foundational data structures.",
-            "• Imposes sub-millisecond execution (<0.45 ms).",
-            "• Bounded heap memory footprint (<12 MB)."
+        (Inches(0.8), Inches(1.7), Inches(3.64), Inches(2.4), "1. Ultra-Fast In-Memory Engine", BORDER_CRIMSON, [
+            "• Runs 100% inside computer memory without databases.",
+            "• Processes incoming predictions in under 0.45 ms.",
+            "• Uses lightweight memory footprint (<12 MB RAM).",
+            "• Zero third-party vendor bloat or subscriptions."
         ]),
-        (Inches(4.84), Inches(1.7), Inches(3.64), Inches(2.4), "2. Real-Time Drift Watchdog", BORDER_GOLD, [
-            "• Two-Sample Kolmogorov-Smirnov Test (O(N log N)).",
-            "• Population Stability Index (PSI) Quantile Binning.",
-            "• Evaluates against Hash Map baseline distributions.",
-            "• Runs every 25 streaming prediction events."
+        (Inches(4.84), Inches(1.7), Inches(3.64), Inches(2.4), "2. Live Drift Watchdog", BORDER_GOLD, [
+            "• Compares live data against baseline training numbers.",
+            "• Uses statistical tests (KS-Test & PSI) automatically.",
+            "• Checks for data drift every 25 predictions.",
+            "• Catches silent accuracy decay immediately."
         ]),
-        (Inches(8.88), Inches(1.7), Inches(3.64), Inches(2.4), "3. Topological RCA (Reverse-BFS)", BORDER_CYAN, [
-            "• Dynamic 4-Layer DAG (Pipelines->Features->Model->Services).",
-            "• Traverses reverse adjacency list upstream in O(V+E).",
-            "• Isolates corrupted feature and source ingestion pipeline.",
-            "• Computes Root Cause Confidence Score (RCS)."
+        (Inches(8.88), Inches(1.7), Inches(3.64), Inches(2.4), "3. Automatic Root-Cause Finder", BORDER_CYAN, [
+            "• Maps connections: Pipelines -> Features -> Model -> Apps.",
+            "• Climbs backwards along the graph in O(V+E) time.",
+            "• Pinpoints the exact corrupted feature automatically.",
+            "• Calculates a clear Root Cause Confidence Score."
         ]),
-        (Inches(0.8), Inches(4.35), Inches(3.64), Inches(2.55), "4. Priority Max-Heap Queue", BORDER_GREEN, [
-            "• Custom array-backed Binary Max-Heap (O(log N)).",
-            "• Pure _sift_up and _sift_down without heap libraries.",
-            "• Composite severity scoring (Accuracy + Drift + Blast).",
-            "• Thread-safe incident resolution and triage."
+        (Inches(0.8), Inches(4.35), Inches(3.64), Inches(2.55), "4. Smart Priority Alerts", BORDER_GREEN, [
+            "• Uses a Binary Max-Heap priority queue in O(log N).",
+            "• Sorts alerts by real severity so biggest issues come first.",
+            "• Combines accuracy drop, drift size, and affected apps.",
+            "• Stops engineers from getting overwhelmed by alerts."
         ]),
-        (Inches(4.84), Inches(4.35), Inches(3.64), Inches(2.55), "5. 4-Step Closed-Loop Gate", BORDER_GOLD, [
-            "• Automated candidate retraining on recent windows.",
-            "• 4-Step Validation: SLA Acc, P99 Latency, SLA Uplift, R2.",
-            "• Zero-downtime version promotion (v1.0.0 -> v1.1.0).",
-            "• Resets node health to HEALTHY and clears alerts."
+        (Inches(4.84), Inches(4.35), Inches(3.64), Inches(2.55), "5. 1-Click Auto-Retraining", BORDER_GOLD, [
+            "• Retrains the model on recent data with 1 simple click.",
+            "• 4-Step Safety Gate ensures the new model is accurate.",
+            "• Promotes the new version (v1.0 -> v1.1) with zero downtime.",
+            "• Clears alerts and restores model health to HEALTHY."
         ]),
-        (Inches(8.88), Inches(4.35), Inches(3.64), Inches(2.55), "6. Session Audit & Replay", BORDER_CRIMSON, [
-            "• Chronological ChatGPT-style session history drawer.",
-            "• 1-Click historical DAG topology snapshot replay.",
-            "• Automated downloadable Markdown post-mortems.",
-            "• Canvas 2D animated graph dashboard & REST APIs."
+        (Inches(8.88), Inches(4.35), Inches(3.64), Inches(2.55), "6. History & Replay Drawer", BORDER_CRIMSON, [
+            "• Clean ChatGPT-style audit drawer tracks every test run.",
+            "• 1-Click Snapshot Replay shows past graph states.",
+            "• Generates downloadable Markdown incident reports.",
+            "• Interactive animated 2D Canvas dashboard."
         ]),
     ]
 
@@ -445,18 +437,18 @@ def create_presentation():
             p.space_before = Pt(2)
 
     # =============================================================
-    # SLIDE 6: System Architecture (5-Layer Pipeline Flow)
+    # SLIDE 6: System Architecture (Simple Step-by-Step Flow)
     # =============================================================
     s6 = prs.slides.add_slide(blank_layout)
     add_bg(s6)
-    add_header(s6, "SYSTEM ARCHITECTURE & DESIGN", "ARGUSML 5-LAYER MASTER TELEMETRY PIPELINE")
+    add_header(s6, "SYSTEM ARCHITECTURE: HOW DATA FLOWS", "ARGUSML 5-LAYER MASTER PIPELINE")
 
     layers = [
-        ("Layer 1: Ingestion Buffer", "Circular FIFO EventQueue (queue.py)", "O(1) Enqueue/Dequeue • Modulo pointer arithmetic • 5,000 Capacity • Zero-allocation overflow protection", BORDER_CYAN),
-        ("Layer 2: Rolling Telemetry", "MetricSlidingWindow (deque.py)", "O(1) Amortized compute • Running confusion matrix • Rolling Accuracy, Precision, F1 • Rolling P99 Latency", BORDER_GOLD),
-        ("Layer 3: Statistical Drift", "DriftEngine & ModelRegistry HashMap", "O(1) Baseline lookup • Two-Sample Kolmogorov-Smirnov Test (D stat, p-val) • Population Stability Index (PSI >= 0.25)", BORDER_CRIMSON),
-        ("Layer 4: Topological RCA", "Dynamic DependencyGraph (graph.py)", "O(V+E) 4-Layer Dynamic DAG • Reverse-BFS Upstream Attribution • Forward-BFS Downstream Blast Radius • RCS Scoring", BORDER_GREEN),
-        ("Layer 5: Priority Alert Heap", "AlertMaxHeap & Closed-Loop Retraining", "O(log N) Push/Pop Max • Pure _sift_up/_sift_down • Composite severity scoring • 4-Step Retraining Validation Gate", BORDER_GOLD)
+        ("Step 1: Incoming Predictions Queue", "Circular FIFO Queue (queue.py)", "Catches fast incoming predictions in a circular line buffer in O(1) time without running out of memory.", BORDER_CYAN),
+        ("Step 2: Recent Predictions Window", "Sliding Window Deque (deque.py)", "Holds the recent 400 predictions to calculate live accuracy, precision, and latency instantly in O(1) time.", BORDER_GOLD),
+        ("Step 3: Statistical Drift Checker", "DriftEngine & Baseline HashMap", "Compares live incoming numbers with original training baselines (KS-Test & PSI) every 25 predictions.", BORDER_CRIMSON),
+        ("Step 4: Connection Graph (RCA)", "Dynamic Dependency Graph (graph.py)", "Traces connections backwards in O(V+E) to find the bad feature, and forwards to see affected user apps.", BORDER_GREEN),
+        ("Step 5: Priority Alerts & Auto-Fix", "Binary Max-Heap & Retraining Gate", "Puts biggest problems at the top in O(log N) time and provides 1-Click Retraining to restore model health.", BORDER_GOLD)
     ]
 
     for idx, (l_title, l_comp, l_desc, b_col) in enumerate(layers):
@@ -491,7 +483,7 @@ def create_presentation():
     # =============================================================
     s7 = prs.slides.add_slide(blank_layout)
     add_bg(s7)
-    add_header(s7, "DATA STRUCTURES & ALGORITHMS FOUNDATION", "CORE DSA MAPPING & THEORETICAL COMPLEXITY MATRIX")
+    add_header(s7, "DATA STRUCTURES & ALGORITHMS FOUNDATION", "5 CORE DATA STRUCTURES & COMPLEXITY MATRIX")
 
     tbl_shape7 = s7.shapes.add_table(6, 5, Inches(0.8), Inches(1.7), Inches(11.73), Inches(5.2))
     tbl7 = tbl_shape7.table
@@ -501,14 +493,15 @@ def create_presentation():
     tbl7.columns[3].width = Inches(2.0)
     tbl7.columns[4].width = Inches(1.8)
 
-    dsa_headers = ["Data Structure", "ArgusML Component", "System Purpose & Implementation", "Time Complexity", "Space Complexity"]
+    dsa_headers = ["Data Structure", "ArgusML Component", "What It Does In Simple Terms", "Time Complexity", "Space Complexity"]
     dsa_rows = [
-        ["Circular FIFO Queue", "EventQueue (queue.py)", "Asynchronous prediction ingestion buffer with modulo pointer wrapping to prevent memory leaks.", "Enqueue: O(1)\nDequeue: O(1)", "O(C)\nFixed Capacity"],
-        ["Double-Ended Queue", "MetricSlidingWindow (deque.py)", "Rolling window over recent W predictions for rolling accuracy, precision, recall, and P99 latency.", "Append / Evict:\nO(1) Amortized", "O(W)\nWindow Size"],
-        ["In-Memory Hash Map", "ModelRegistry (registry.py)", "Constant-time model lookup, baseline empirical distribution storage, and SLA threshold indexing.", "Average Lookup: O(1)\nInsert: O(1)", "O(M * F)\nModels & Features"],
-        ["Binary Max-Heap", "AlertMaxHeap (heap.py)", "Priority queue with custom _sift_up / _sift_down ranking incidents by composite severity score.", "Push: O(log N)\nPop Max: O(log N)", "O(N)\nActive Incidents"],
-        ["Directed Acyclic Graph", "DependencyGraph (graph.py)", "4-layer topology (Pipelines -> Features -> Model -> Services) for upstream RCA and downstream blast.", "Reverse-BFS: O(V+E)\nForward-BFS: O(V+E)", "O(V + E)\nNodes & Edges"]
+        ["Circular FIFO Queue", "EventQueue (queue.py)", "Line buffer for incoming predictions; safely drops oldest items during bursts without memory leaks.", "Enqueue: O(1)\nDequeue: O(1)", "O(C)\nFixed Capacity"],
+        ["Double-Ended Queue", "MetricSlidingWindow (deque.py)", "Sliding window of 400 recent predictions to calculate accuracy and speed instantly without recalculating past data.", "Append / Evict:\nO(1) Amortized", "O(W)\nWindow Size"],
+        ["In-Memory Hash Map", "ModelRegistry (registry.py)", "Instant dictionary lookup for model info and baseline reference numbers.", "Average Lookup: O(1)\nInsert: O(1)", "O(M * F)\nModels & Features"],
+        ["Binary Max-Heap", "AlertMaxHeap (heap.py)", "Smart priority queue that sorts alerts so the biggest problem is always at the top.", "Push: O(log N)\nPop Max: O(log N)", "O(N)\nActive Incidents"],
+        ["Directed Acyclic Graph", "DependencyGraph (graph.py)", "Map of connections (Pipelines -> Features -> Model -> Apps) to trace causes backwards and impacts forwards.", "Reverse-BFS: O(V+E)\nForward-BFS: O(V+E)", "O(V + E)\nNodes & Edges"]
     ]
+
 
     for c_idx, h in enumerate(dsa_headers):
         cell = tbl7.cell(0, c_idx)
@@ -1099,6 +1092,7 @@ def create_presentation():
     docs_path = os.path.abspath("docs")
 
     save_targets = [
+        os.path.join(downloads_path, "ArgusML_Simple_Presentation.pptx"),
         os.path.join(downloads_path, "ArgusML_Final_Presentation.pptx"),
         os.path.join(desktop_path, "ArgusML_Final_Presentation.pptx"),
         os.path.join(docs_path, "ArgusML_Presentation.pptx"),
