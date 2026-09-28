@@ -334,9 +334,15 @@
           <input type="file" id="reg-csv-file" class="form-input" accept=".csv" required>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Downstream Consumer Services (Comma Separated)</label>
-          <input type="text" id="reg-downstream" class="form-input" value="Core Lending API, Risk Review Dashboard, Underwriting Engine">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Upstream Pipelines (Comma Separated)</label>
+            <input type="text" id="reg-upstream" class="form-input" value="Primary Ingestion ETL, Stream Ingestion" placeholder="e.g. Kafka Stream, Webhook ETL">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Downstream Services (Comma Separated)</label>
+            <input type="text" id="reg-downstream" class="form-input" value="Core API Gateway, Risk Review Dashboard, Underwriting Engine" placeholder="e.g. Checkout API, Pricing Service">
+          </div>
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">

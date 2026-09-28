@@ -721,6 +721,7 @@ function autoFillDiabetesSample() {
   document.getElementById('reg-model-name').value = 'Clinical Diabetes Risk Predictor';
   document.getElementById('reg-model-type').value = 'CLASSIFICATION';
   document.getElementById('reg-target-col').value = 'has_diabetes';
+  document.getElementById('reg-upstream').value = 'Hospital HL7 Datafeed, EHR Kafka Ingestion';
   document.getElementById('reg-downstream').value = 'Hospital Emergency Alert System, Patient Portal API, EHR Telemetry';
 
   // Generate a sample CSV file on the fly and put into file input
@@ -749,12 +750,16 @@ async function handleRegisterModelSubmit(e) {
     return;
   }
 
+  const upstreamEl = document.getElementById('reg-upstream');
+  const upstreamStr = upstreamEl ? upstreamEl.value : 'Primary Ingestion ETL, Stream Ingestion';
+
   const formData = new FormData();
   formData.append('file', fileInput.files[0]);
   formData.append('model_id', document.getElementById('reg-model-id').value);
   formData.append('name', document.getElementById('reg-model-name').value);
   formData.append('model_type', document.getElementById('reg-model-type').value);
   formData.append('target_column', document.getElementById('reg-target-col').value);
+  formData.append('upstream_pipelines_str', upstreamStr);
   formData.append('downstream_services_str', document.getElementById('reg-downstream').value);
 
   try {
