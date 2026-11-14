@@ -77,10 +77,86 @@ def run_ks_test(
     return float(round(ks_stat, 4)), float(round(p_val, 6)), is_drift
 
 
+def apply_benjamini_hochberg(
+    feature_results: Dict[str, Dict[str, Any]], q_level: float = 0.05
+) -> Dict[str, Dict[str, Any]]:
+    """
+    Applies the Benjamini-Hochberg (BH) procedure to control False Discovery Rate (FDR)
+    across M simultaneous feature drift hypothesis tests.
+
+    Eliminates family-wise alpha inflation when monitoring high-dimensional models:
+      P_family = 1 - (1 - alpha)^M (e.g. 78.5% false alarm rate for 30 features at alpha=0.05).
+
+    Algorithm:
+      1. Rank features by ascending raw p-value: P_(1) <= P_(2) <= ... <= P_(M).
+      2. Find largest rank k such that P_(k) <= (k / M) * Q.
+      3. Declare all hypotheses with rank i <= k as statistically significant.
+      4. Compute adjusted p-values (step-up procedure):
+         p_adj_(i) = min(1.0, min_{j >= i} (M / j * P_(j)))
+    """
+    valid_features = [
+        f for f, r in feature_results.items() if r.get("status") == "EVALUATED"
+    ]
+    M = len(valid_features)
+    if M == 0:
+        return feature_results
+
+    # Sort feature names by ascending raw p-value
+    sorted_feats = sorted(
+        valid_features, key=lambda f: feature_results[f].get("p_value", 1.0)
+    )
+
+    # 1. Identify max index k where P_(k) <= (k / M) * Q
+    max_k = 0
+    for rank_1_based, feat in enumerate(sorted_feats, start=1):
+        raw_p = feature_results[feat].get("p_value", 1.0)
+        crit_val = (rank_1_based / M) * q_level
+        if raw_p <= crit_val:
+            max_k = rank_1_based
+
+    # 2. Compute BH step-up adjusted p-values
+    p_adj_map = {}
+    running_min = 1.0
+    for rank_1_based in range(M, 0, -1):
+        feat = sorted_feats[rank_1_based - 1]
+        raw_p = feature_results[feat].get("p_value", 1.0)
+        step_val = (M / rank_1_based) * raw_p
+        running_min = min(running_min, step_val)
+        p_adj_map[feat] = float(round(min(1.0, running_min), 6))
+
+    # 3. Apply FDR discoveries & update drift classifications
+    for rank_1_based, feat in enumerate(sorted_feats, start=1):
+        rec = feature_results[feat]
+        is_fdr_sig = rank_1_based <= max_k
+        raw_p = rec.get("p_value", 1.0)
+        ks_stat = rec.get("ks_statistic", 0.0)
+        psi_val = rec.get("psi", 0.0)
+
+        rec["p_value_raw"] = raw_p
+        rec["p_value_fdr_adjusted"] = p_adj_map[feat]
+        rec["fdr_threshold"] = round((rank_1_based / M) * q_level, 6)
+        rec["fdr_significant"] = is_fdr_sig
+        rec["fdr_rank"] = rank_1_based
+        rec["multiple_testing_correction"] = "Benjamini-Hochberg (FDR)"
+
+        # Drift confirmed if:
+        # (a) Statistically significant under FDR control AND KS-stat > 0.15, OR
+        # (b) Population Stability Index indicates real distribution shift (PSI >= 0.15)
+        drift_detected = (is_fdr_sig and ks_stat > 0.15) or (psi_val >= 0.15)
+        rec["drift_detected"] = drift_detected
+
+        # Re-tune severity to prevent false alarm spam
+        if not drift_detected and rec.get("severity") == "WARNING":
+            rec["severity"] = "NORMAL"
+
+    return feature_results
+
+
 class DriftEngine:
     """
     Evaluates current sliding window against registered model baselines
-    for all features, calculating drift scores, PSI, and drift classifications.
+    for all features, calculating drift scores, PSI, and drift classifications
+    with algorithmic Benjamini-Hochberg False Discovery Rate (FDR) control.
     """
 
     def __init__(self, significance_level: float = 0.05):
@@ -150,26 +226,42 @@ class DriftEngine:
         current_map: Dict[str, List[float]],
     ) -> Dict[str, Any]:
         """
-        Evaluates all features for a model.
-        Returns detailed summary and ranks features by drift magnitude.
+        Evaluates all features for a model with Benjamini-Hochberg FDR control.
+        Returns detailed summary, multiple-testing audit, and ranks features by drift magnitude.
         """
         feature_results = {}
-        drifting_features = []
 
         for feat_name, cur_samples in current_map.items():
             base_samples = baseline_map.get(feat_name, [])
             res = self.evaluate_feature(feat_name, base_samples, cur_samples)
             feature_results[feat_name] = res
-            if res["drift_detected"]:
-                drifting_features.append(res)
+
+        # Apply Benjamini-Hochberg False Discovery Rate correction
+        feature_results = apply_benjamini_hochberg(
+            feature_results, q_level=self.significance_level
+        )
+
+        drifting_features = [
+            r for r in feature_results.values() if r.get("drift_detected", False)
+        ]
 
         # Sort drifting features descending by KS-statistic + PSI composite
         drifting_features.sort(
             key=lambda x: (x["ks_statistic"] + x["psi"]), reverse=True
         )
 
+        fdr_sig_count = sum(
+            1 for r in feature_results.values() if r.get("fdr_significant", False)
+        )
+
         return {
             "evaluated_features": feature_results,
             "drifting_count": len(drifting_features),
             "top_drifting_features": drifting_features,
+            "multiple_testing": {
+                "correction_method": "Benjamini-Hochberg (FDR)",
+                "nominal_q_level": self.significance_level,
+                "hypotheses_tested": len(feature_results),
+                "fdr_discoveries": fdr_sig_count,
+            },
         }

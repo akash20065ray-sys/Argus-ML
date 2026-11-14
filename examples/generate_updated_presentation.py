@@ -104,10 +104,10 @@ def create_presentation():
     tf_c = college_pill.text_frame
     tf_c.vertical_anchor = MSO_ANCHOR.MIDDLE
     p_c = tf_c.paragraphs[0]
-    p_c.text = "VISHWAKARMA INSTITUTE OF TECHNOLOGY, PUNE"
+    p_c.text = "VISHWAKARMA INSTITUTE OF TECHNOLOGY, PUNE • DEPT. OF AI & DATA SCIENCE"
     p_c.alignment = PP_ALIGN.CENTER
     p_c.font.name = "Arial"
-    p_c.font.size = Pt(14)
+    p_c.font.size = Pt(13)
     p_c.font.bold = True
     p_c.font.color.rgb = TEXT_GOLD
 
@@ -166,21 +166,47 @@ def create_presentation():
     tf_p2 = pill2.text_frame
     tf_p2.vertical_anchor = MSO_ANCHOR.MIDDLE
     p_p2 = tf_p2.paragraphs[0]
-    p_p2.text = "Guide: Prof. Sheela"
+    p_p2.text = "Guide: Prof. Sheela Chinchmalatpure"
     p_p2.alignment = PP_ALIGN.CENTER
     p_p2.font.name = "Arial"
     p_p2.font.size = Pt(14)
     p_p2.font.bold = True
     p_p2.font.color.rgb = TEXT_GOLD
 
+    # Team Members Banner on Cover Slide (Prominently Named)
+    card_tm = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.5), Inches(5.45), Inches(10.33), Inches(0.72))
+    card_tm.fill.solid()
+    card_tm.fill.fore_color.rgb = BG_CARD
+    card_tm.line.color.rgb = BORDER_MUTED
+    card_tm.line.width = Pt(1.0)
+    tf_tm = card_tm.text_frame
+    tf_tm.vertical_anchor = MSO_ANCHOR.MIDDLE
+
+    p_tm1 = tf_tm.paragraphs[0]
+    p_tm1.text = "TEAM MEMBERS (GROUP - 9)"
+    p_tm1.alignment = PP_ALIGN.CENTER
+    p_tm1.font.name = "Arial"
+    p_tm1.font.size = Pt(9.5)
+    p_tm1.font.bold = True
+    p_tm1.font.color.rgb = BORDER_CRIMSON
+
+    p_tm2 = tf_tm.add_paragraph()
+    p_tm2.text = "Ghansham Agaldare (Roll 4)   •   Krishna Aher (Roll 7)   •   Akash Kumar (Roll 9)   •   Sanskar Bhargude (Roll 38)   •   Hari Birare (Roll 49)"
+    p_tm2.alignment = PP_ALIGN.CENTER
+    p_tm2.font.name = "Calibri"
+    p_tm2.font.size = Pt(11.5)
+    p_tm2.font.bold = True
+    p_tm2.font.color.rgb = TEXT_WHITE
+    p_tm2.space_before = Pt(2)
+
     # Bottom Metadata Box
-    tb_bot = s1.shapes.add_textbox(Inches(1.0), Inches(6.1), Inches(11.33), Inches(0.8))
+    tb_bot = s1.shapes.add_textbox(Inches(1.0), Inches(6.42), Inches(11.33), Inches(0.6))
     tf_b = tb_bot.text_frame
     p_b = tf_b.paragraphs[0]
     p_b.text = "28/09/2026   •   Built with 5 Core Data Structures   •   Platform: Python & FastAPI"
     p_b.alignment = PP_ALIGN.CENTER
     p_b.font.name = "Calibri"
-    p_b.font.size = Pt(12)
+    p_b.font.size = Pt(11)
     p_b.font.color.rgb = TEXT_DIM
 
     # =============================================================
@@ -461,46 +487,43 @@ def create_presentation():
             p.space_before = Pt(2)
 
     # =============================================================
-    # SLIDE 6: System Architecture (Simple Step-by-Step Flow)
+    # SLIDE 6: Figure 1 - System Architecture (From Research Paper)
     # =============================================================
     s6 = prs.slides.add_slide(blank_layout)
     add_bg(s6)
-    add_header(s6, "SYSTEM ARCHITECTURE: HOW DATA FLOWS", "ARGUSML 5-LAYER MASTER PIPELINE")
+    add_header(s6, "FIGURE 1: SYSTEM ARCHITECTURE (FROM RESEARCH PAPER)", "ARGUSML ENTERPRISE MULTI-PLANE PIPELINE • 5 FOUNDATIONAL DATA STRUCTURES")
 
-    layers = [
-        ("Step 1: Incoming Predictions Queue", "Circular FIFO Queue (queue.py)", "Catches fast incoming predictions in a circular line buffer in O(1) time without running out of memory.", BORDER_CYAN),
-        ("Step 2: Recent Predictions Window", "Sliding Window Deque (deque.py)", "Holds the recent 400 predictions to calculate live accuracy, precision, and latency instantly in O(1) time.", BORDER_GOLD),
-        ("Step 3: Statistical Drift Checker", "DriftEngine & Baseline HashMap", "Compares live incoming numbers with original training baselines (KS-Test & PSI) every 25 predictions.", BORDER_CRIMSON),
-        ("Step 4: Connection Graph (RCA)", "Dynamic Dependency Graph (graph.py)", "Traces connections backwards in O(V+E) to find the bad feature, and forwards to see affected user apps.", BORDER_GREEN),
-        ("Step 5: Priority Alerts & Auto-Fix", "Binary Max-Heap & Retraining Gate", "Puts biggest problems at the top in O(log N) time and provides 1-Click Retraining to restore model health.", BORDER_GOLD)
-    ]
+    arch_img_path = os.path.abspath("docs/figures/fig0_system_architecture.png")
 
-    for idx, (l_title, l_comp, l_desc, b_col) in enumerate(layers):
-        top_pos = Inches(1.7 + (idx * 1.05))
-        card = s6.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), top_pos, Inches(11.73), Inches(0.92))
-        card.fill.solid()
-        card.fill.fore_color.rgb = BG_CARD
-        card.line.color.rgb = b_col
-        card.line.width = Pt(1.5)
+    # Main Card for Figure 1 (White background matching research paper figure)
+    card_w = Inches(11.73)
+    card_h = Inches(5.5)
+    img_card = s6.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.55), card_w, card_h)
+    img_card.fill.solid()
+    img_card.fill.fore_color.rgb = RGBColor(255, 255, 255)
+    img_card.line.color.rgb = BORDER_CYAN
+    img_card.line.width = Pt(1.5)
 
-        tf = card.text_frame
-        tf.word_wrap = True
-        tf.margin_left = Inches(0.2)
-        tf.margin_top = Inches(0.1)
+    if os.path.exists(arch_img_path):
+        # Aspect ratio: 1376x768 = 1.7916
+        # Picture width = 11.3 in, height = 4.8 in
+        pic_w = Inches(11.0)
+        pic_h = Inches(4.65)
+        pic_left = Inches(0.8 + (11.73 - 11.0) / 2)
+        pic_top = Inches(1.70)
+        s6.shapes.add_picture(arch_img_path, pic_left, pic_top, width=pic_w, height=pic_h)
 
-        p1 = tf.paragraphs[0]
-        p1.text = f"{l_title.upper()}  ➔  {l_comp}"
-        p1.font.name = "Arial"
-        p1.font.size = Pt(11.5)
-        p1.font.bold = True
-        p1.font.color.rgb = b_col
-
-        p2 = tf.add_paragraph()
-        p2.text = l_desc
-        p2.font.name = "Calibri"
-        p2.font.size = Pt(10.5)
-        p2.font.color.rgb = TEXT_OFFWHITE
-        p2.space_before = Pt(2)
+    # Formal Academic Caption matching Research Paper
+    tb_cap = s6.shapes.add_textbox(Inches(0.9), Inches(6.5), Inches(11.53), Inches(0.5))
+    tf_cap = tb_cap.text_frame
+    tf_cap.word_wrap = True
+    p_cap = tf_cap.paragraphs[0]
+    p_cap.text = "Fig. 1. Enterprise Multi-Plane System Architecture of ArgusML: Prediction API Ingestion (Layer 1), Circular FIFO Queue (Layer 2), Metric Sliding Window & Hash Map Registry (Layer 3), Statistical Drift Engine & 4-Layer DAG (Layer 4), and Binary Max-Heap Alert Queue & Automated Retraining Gate (Layer 5)."
+    p_cap.alignment = PP_ALIGN.CENTER
+    p_cap.font.name = "Calibri"
+    p_cap.font.size = Pt(10.5)
+    p_cap.font.bold = True
+    p_cap.font.color.rgb = RGBColor(15, 23, 42)
 
     # =============================================================
     # SLIDE 7: DSA Foundation & Complexity Analysis Matrix
@@ -569,7 +592,7 @@ def create_presentation():
     # =============================================================
     s8 = prs.slides.add_slide(blank_layout)
     add_bg(s8)
-    add_header(s8, "Data Ingestion Buffer & Statistical Drift Engine", "MODULE LEAD: KRISHNA")
+    add_header(s8, "Data Ingestion Buffer & Statistical Drift Engine", "MODULE LEAD: KRISHNA AHER (ROLL NO. 7)")
 
     card_k1 = s8.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.7), Inches(5.7), Inches(5.2))
     card_k1.fill.solid()
@@ -605,46 +628,54 @@ def create_presentation():
         p.font.color.rgb = col
         p.space_before = Pt(3)
 
-    card_k2 = s8.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(6.83), Inches(1.7), Inches(5.7), Inches(5.2))
+    card_k2 = s8.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(6.83), Inches(1.7), Inches(5.7), Inches(2.9))
     card_k2.fill.solid()
     card_k2.fill.fore_color.rgb = BG_CARD
     card_k2.line.color.rgb = BORDER_GOLD
     card_k2.line.width = Pt(1.5)
     tf_k2 = card_k2.text_frame
     tf_k2.word_wrap = True
-    tf_k2.margin_left = tf_k2.margin_right = tf_k2.margin_top = Inches(0.2)
+    tf_k2.margin_left = tf_k2.margin_right = tf_k2.margin_top = Inches(0.18)
     p = tf_k2.paragraphs[0]
     p.text = "📊 Statistical Drift Engine (detector.py)"
     p.font.name = "Arial"
-    p.font.size = Pt(13)
+    p.font.size = Pt(12)
     p.font.bold = True
     p.font.color.rgb = BORDER_GOLD
 
     k2_bullets = [
-        ("• Two-Sample Kolmogorov-Smirnov Test:", True, TEXT_CYAN),
-        ("  Compares empirical cumulative distributions (eCDF) in O(N log N) time: D = sup |F_base(x) - F_prod(x)|. Rejects null hypothesis if p-value < 0.05.", False, TEXT_MUTED),
-        ("• Population Stability Index (PSI):", True, TEXT_CYAN),
-        ("  Measures shift across 10 quantile bins in O(N + B) time: PSI = SUM((Actual% - Expected%) * ln(Actual% / Expected%)).", False, TEXT_MUTED),
-        ("• Quantile Binning Calibration:", True, TEXT_CYAN),
-        ("  PSI < 0.10: Stable | 0.10 <= PSI < 0.25: Moderate Drift | PSI >= 0.25: Critical Covariate Drift.", False, TEXT_MUTED),
-        ("• Batched Analytical Cadence:", True, TEXT_CYAN),
-        ("  Evaluates statistical drift every 25 processed events to balance statistical sample power with microsecond compute overhead.", False, TEXT_MUTED)
+        ("• Two-Sample Kolmogorov-Smirnov Test (O(N log N)):", True, TEXT_CYAN),
+        ("  D = sup |F_base(x) - F_prod(x)|. Rejects null hypothesis if p-value < 0.05.", False, TEXT_MUTED),
+        ("• Population Stability Index (PSI, O(N + B)):", True, TEXT_CYAN),
+        ("  Measures shift across 10 quantile bins: PSI >= 0.25 flags critical covariate shift.", False, TEXT_MUTED),
+        ("• Benjamini-Hochberg FDR Control (Q = 0.05):", True, TEXT_CYAN),
+        ("  Suppresses false alarms across high-dimensional feature spaces under streaming tests.", False, TEXT_MUTED),
     ]
     for text, is_bold, col in k2_bullets:
         p = tf_k2.add_paragraph()
         p.text = text
         p.font.name = "Calibri"
-        p.font.size = Pt(10.5)
+        p.font.size = Pt(9.5)
         p.font.bold = is_bold
         p.font.color.rgb = col
-        p.space_before = Pt(3)
+        p.space_before = Pt(2)
+
+    # Embed Figure from Research Paper (fig1_ks_psi_drift_cdf.png)
+    ks_img_path = os.path.abspath("docs/figures/fig1_ks_psi_drift_cdf.png")
+    if os.path.exists(ks_img_path):
+        img_card_k = s8.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(6.83), Inches(4.75), Inches(5.7), Inches(2.15))
+        img_card_k.fill.solid()
+        img_card_k.fill.fore_color.rgb = RGBColor(255, 255, 255)
+        img_card_k.line.color.rgb = BORDER_GOLD
+        img_card_k.line.width = Pt(1.2)
+        s8.shapes.add_picture(ks_img_path, Inches(6.93), Inches(4.8), width=Inches(5.5), height=Inches(2.05))
 
     # =============================================================
     # SLIDE 9: Aakash (DAG, Reverse-BFS, RCS)
     # =============================================================
     s9 = prs.slides.add_slide(blank_layout)
     add_bg(s9)
-    add_header(s9, "Dynamic Dependency DAG & Reverse-BFS Attribution", "MODULE LEAD: AAKASH (PROJECT LEAD)")
+    add_header(s9, "Dynamic Dependency DAG & Reverse-BFS Attribution", "MODULE LEAD: AKASH KUMAR - PROJECT LEAD (ROLL NO. 9)")
 
     card_a1 = s9.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.7), Inches(5.7), Inches(5.2))
     card_a1.fill.solid()
@@ -727,7 +758,7 @@ def create_presentation():
     # =============================================================
     s10 = prs.slides.add_slide(blank_layout)
     add_bg(s10)
-    add_header(s10, "Incident Priority Max-Heap & Automated Retraining", "MODULE LEAD: SANSKAR")
+    add_header(s10, "Incident Priority Max-Heap & Automated Retraining", "MODULE LEAD: SANSKAR BHARGUDE (ROLL NO. 38)")
 
     card_s1 = s10.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.7), Inches(5.7), Inches(5.2))
     card_s1.fill.solid()
@@ -802,7 +833,7 @@ def create_presentation():
     # =============================================================
     s11 = prs.slides.add_slide(blank_layout)
     add_bg(s11)
-    add_header(s11, "In-Memory Baseline Registry & Traffic Simulator", "MODULE LEAD: GHANSHYAM")
+    add_header(s11, "In-Memory Baseline Registry & Traffic Simulator", "MODULE LEAD: GHANSHAM AGALDARE (ROLL NO. 4)")
 
     card_g1 = s11.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.7), Inches(5.7), Inches(5.2))
     card_g1.fill.solid()
@@ -877,7 +908,7 @@ def create_presentation():
     # =============================================================
     s12 = prs.slides.add_slide(blank_layout)
     add_bg(s12)
-    add_header(s12, "History Drawer, Post-Mortems & Canvas Dashboard", "MODULE LEAD: HARI")
+    add_header(s12, "History Drawer, Post-Mortems & Canvas Dashboard", "MODULE LEAD: HARI BIRARE (ROLL NO. 49)")
 
     card_h1 = s12.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.7), Inches(5.7), Inches(5.2))
     card_h1.fill.solid()
@@ -1038,10 +1069,10 @@ def create_presentation():
 
     # 4 Stat Cards on Top
     stat_coords = [
-        (Inches(0.8), Inches(1.7), Inches(2.78), Inches(1.5), "17 / 17 Tests Passed", "100% Pass Rate across Queue, Deque, Heap, Graph, Drift & Retrain suites.", BORDER_GREEN),
-        (Inches(3.78), Inches(1.7), Inches(2.78), Inches(1.5), "< 0.45 ms Overhead", "Ultra-low telemetry compute latency; zero impact on inference throughput.", BORDER_CYAN),
-        (Inches(6.76), Inches(1.7), Inches(2.78), Inches(1.5), "100% RCA Accuracy", "Reverse-BFS consistently isolated culprit features with >86% confidence.", BORDER_GOLD),
-        (Inches(9.74), Inches(1.7), Inches(2.78), Inches(1.5), "v1.0.0 ➔ v1.1.0 Promoted", "Automated validation gate recovered accuracy from 68% to 96% with zero downtime.", BORDER_CRIMSON),
+        (Inches(0.8), Inches(1.7), Inches(2.78), Inches(1.5), "19 / 19 Tests Passed", "100% Pass Rate across Queue, Deque, Heap, Graph, Drift, History & Retrain.", BORDER_GREEN),
+        (Inches(3.78), Inches(1.7), Inches(2.78), Inches(1.5), "17.0 μs In-Line / <0.45ms", "1.21 MB peak RAM footprint (83%-95% reduction vs Prometheus/Evidently).", BORDER_CYAN),
+        (Inches(6.76), Inches(1.7), Inches(2.78), Inches(1.5), "100% RCA Accuracy", "Reverse-BFS consistently isolated culprit features in 19.36 μs.", BORDER_GOLD),
+        (Inches(9.74), Inches(1.7), Inches(2.78), Inches(1.5), "v1.0.0 ➔ v1.1.0 Promoted", "Accuracy: 52.4% -> 96.1% (Churn), R2: 0.41 -> 0.94 (Housing) restored in <2s.", BORDER_CRIMSON),
     ]
 
     for left, top, width, height, num_txt, desc_txt, b_col in stat_coords:
@@ -1116,13 +1147,16 @@ def create_presentation():
     docs_path = os.path.abspath("docs")
 
     save_targets = [
+        os.path.join(downloads_path, "ArgusML_Presentation_With_Names.pptx"),
+        os.path.join(desktop_path, "ArgusML_Presentation_With_Names.pptx"),
+        os.path.join(downloads_path, "ArgusML_Presentation_With_Figure1.pptx"),
+        os.path.join(desktop_path, "ArgusML_Presentation_With_Figure1.pptx"),
         os.path.join(downloads_path, "ArgusML_Latest_Presentation.pptx"),
-        os.path.join(downloads_path, "ArgusML_LitReview_Presentation.pptx"),
-        os.path.join(downloads_path, "ArgusML_Simple_Presentation.pptx"),
         os.path.join(downloads_path, "ArgusML_Final_Presentation.pptx"),
+        os.path.join(downloads_path, "ArgusML_Presentation.pptx"),
+        os.path.join(downloads_path, "ArgusML_Simple_Presentation.pptx"),
         os.path.join(desktop_path, "ArgusML_Final_Presentation.pptx"),
         os.path.join(docs_path, "ArgusML_Presentation.pptx"),
-        os.path.join(downloads_path, "ArgusML_Presentation.pptx"),
         os.path.join(desktop_path, "ArgusML_Presentation.pptx"),
     ]
 

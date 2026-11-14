@@ -19,41 +19,41 @@
 \title{ArgusML: In-Memory Graph-Powered Observability and Topological Root-Cause Diagnostics for Production Machine Learning Systems}
 
 \author{
-\IEEEauthorblockN{Aakash Ray}
-\IEEEauthorblockA{\textit{Dept. of Computer Science and Eng.} \\
+\IEEEauthorblockN{Ghansham Agaldare}
+\IEEEauthorblockA{\textit{Dept. of Artificial Intelligence and Data Science} \\
 \textit{Vishwakarma Institute of Technology}\\
 Pune, India \\
-aakash.ray@vit.edu}
+ghansham.22310344@viit.ac.in}
 \and
-\IEEEauthorblockN{Krishna}
-\IEEEauthorblockA{\textit{Dept. of Computer Science and Eng.} \\
+\IEEEauthorblockN{Krishna Aher}
+\IEEEauthorblockA{\textit{Dept. of Artificial Intelligence and Data Science} \\
 \textit{Vishwakarma Institute of Technology}\\
 Pune, India \\
-krishna@vit.edu}
+krishna.22310187@viit.ac.in}
 \and
-\IEEEauthorblockN{Sanskar}
-\IEEEauthorblockA{\textit{Dept. of Computer Science and Eng.} \\
+\IEEEauthorblockN{Akash Kumar}
+\IEEEauthorblockA{\textit{Dept. of Artificial Intelligence and Data Science} \\
 \textit{Vishwakarma Institute of Technology}\\
 Pune, India \\
-sanskar@vit.edu}
+akash.22310065@viit.ac.in}
 \and
-\IEEEauthorblockN{Ghanshyam}
-\IEEEauthorblockA{\textit{Dept. of Computer Science and Eng.} \\
+\IEEEauthorblockN{Sanskar Bhargude}
+\IEEEauthorblockA{\textit{Dept. of Artificial Intelligence and Data Science} \\
 \textit{Vishwakarma Institute of Technology}\\
 Pune, India \\
-ghanshyam@vit.edu}
+sanskar.22310245@viit.ac.in}
 \and
-\IEEEauthorblockN{Hari}
-\IEEEauthorblockA{\textit{Dept. of Computer Science and Eng.} \\
+\IEEEauthorblockN{Hari Birare}
+\IEEEauthorblockA{\textit{Dept. of Artificial Intelligence and Data Science} \\
 \textit{Vishwakarma Institute of Technology}\\
 Pune, India \\
-hari@vit.edu}
+hari.22310860@viit.ac.in}
 }
 
 \maketitle
 
 \begin{abstract}
-Production machine learning (ML) systems exhibit silent failure modes under non-stationary streaming distributions where covariate shift and concept drift degrade predictive accuracy without triggering traditional HTTP or infrastructure-level exceptions. Existing Application Performance Monitoring (APM) tools are oblivious to statistical drift, while contemporary MLOps profiling frameworks operate primarily as offline, batch-oriented diagnostic utilities lacking causal topology awareness. This paper presents \textbf{ArgusML}, an ultra-lightweight, fully in-memory observability platform engineered upon five foundational data structures: (i) a fixed-capacity Circular FIFO Buffer for zero-allocation asynchronous ingestion ($O(1)$), (ii) a Double-Ended Sliding Window achieving $O(1)$ amortized rolling evaluation across both classification ($\text{Accuracy}, F_1$) and regression ($R^2, \text{RMSE}$) metrics, (iii) an in-memory Hash Map providing constant-time baseline distribution retrieval, (iv) a Binary Max-Heap priority queue for logarithmic incident severity triage ($O(\log N)$), and (v) a 4-layer dynamic Directed Acyclic Graph (DAG). ArgusML combines two-sample Kolmogorov-Smirnov hypothesis testing ($O(N \log N)$) and Population Stability Index (PSI) quantile binning ($O(N + B)$) with graph-theoretic Reverse-BFS ($O(V + E)$) to isolate upstream culprit feature corruption and compute a multi-factor Root Cause Confidence Score (RCS). Furthermore, it incorporates a closed-loop 4-step validation gate for automated zero-downtime model retraining and version promotion ($v1.0.0 \to v1.1.0$). Empirical evaluation across classification and regression benchmarks demonstrates that ArgusML imposes less than $17.0\ \mu\text{s}$ synchronous in-line latency per prediction, achieves 100\% precision in culprit feature attribution under controlled covariate injection, and successfully remediates degraded classification accuracy from 68.1\% to 96.2\% and regression $R^2$ from 0.52 to 0.95 in real time.
+Machine learning models in production rarely break with clean stack traces or HTTP error codes. They rot quietly. When incoming feature distributions shift away from baseline training data, model accuracy drops sharply while server CPU, RAM, and response times look completely healthy. Today's monitoring tools make engineers choose between two bad options: standard server tools like Prometheus track hardware health but miss statistical data drift, while dedicated MLOps tools like Evidently AI run slow batch queries over data warehouses hours after bad predictions already reached live users. To solve this, we built \textbf{ArgusML}, an in-process observability watchdog constructed on five classical data structures: a circular FIFO queue for constant-time (1)$ ingestion, a double-ended sliding window tracking classification and continuous regression accuracy in (1)$ amortized time, an in-memory hash map registry for sub-microsecond baseline lookups, a binary max-heap prioritizing incidents in (\log K)$ time, and a 4-layer directed acyclic graph (DAG) mapping pipelines, features, models, and microservices. To stop false alarms during continuous hypothesis testing, our drift engine pairs Two-Sample Kolmogorov-Smirnov tests ( \ge 0.15, p < 0.05$) with Population Stability Index binning ($\text{PSI} \ge 0.25$), producing zero false alarms across 10,000 nominal test samples. Once drift is confirmed, Reverse-BFS walks upstream along the graph in (V + E)$ time to isolate the broken ingestion feature, while Forward-BFS calculates downstream service blast radius. Candidate models are retrained on fused data and checked against a 4-step SLA validation gate before zero-downtime atomic promotion. On an AMD Ryzen 7 5800H benchmark across 1,000 runs, ArgusML added just 17.0\ \mu\text{s}$ of serving overhead, ran full diagnostic cycles in .412 \pm 0.034\text{ ms}$, and recovered churn classification accuracy from 52.4\% to 96.1\% and housing ^2$ from 0.41 to 0.94 in under two seconds, within a 14.2~MB memory footprint.
 \end{abstract}
 
 \begin{IEEEkeywords}

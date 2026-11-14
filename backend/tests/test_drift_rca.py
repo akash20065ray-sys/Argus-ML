@@ -4,7 +4,12 @@ Unit Tests for Statistical Drift and Root-Cause Analysis (RCA).
 
 import numpy as np
 import pytest
-from backend.app.core.drift.detector import DriftEngine, calculate_psi, run_ks_test
+from backend.app.core.drift.detector import (
+    DriftEngine,
+    calculate_psi,
+    run_ks_test,
+    apply_benjamini_hochberg,
+)
 from backend.app.core.dsa.graph import DependencyGraph
 from backend.app.core.dsa.heap import AlertMaxHeap
 from backend.app.core.rca.engine import RootCauseAnalysisEngine
@@ -144,3 +149,82 @@ def test_multi_candidate_rcs_confidence_ranking():
     assert candidates[1]["feature"] == "ip"
     assert candidates[2]["feature"] == "age"
     assert candidates[0]["confidence_score"] > candidates[1]["confidence_score"] > candidates[2]["confidence_score"]
+
+
+def test_benjamini_hochberg_fdr_multiple_testing():
+    """
+    Validates that Benjamini-Hochberg (FDR) correction controls family-wise
+    false discoveries when evaluating multiple features simultaneously.
+    """
+    engine = DriftEngine(significance_level=0.05)
+
+    # 1. Feature test results with 1 genuine drift (p=0.0001, ks=0.45)
+    # and 4 non-drifting noisy features with borderline raw p-values (p=0.04)
+    # Under naive uncorrected testing, all 5 would flag drift!
+    raw_results = {
+        "feat_culprit": {
+            "feature": "feat_culprit",
+            "status": "EVALUATED",
+            "ks_statistic": 0.45,
+            "p_value": 0.0001,
+            "psi": 0.35,
+            "severity": "CRITICAL",
+            "drift_detected": True,
+        },
+        "feat_noise_1": {
+            "feature": "feat_noise_1",
+            "status": "EVALUATED",
+            "ks_statistic": 0.16,
+            "p_value": 0.040,
+            "psi": 0.02,
+            "severity": "WARNING",
+            "drift_detected": True,
+        },
+        "feat_noise_2": {
+            "feature": "feat_noise_2",
+            "status": "EVALUATED",
+            "ks_statistic": 0.17,
+            "p_value": 0.042,
+            "psi": 0.03,
+            "severity": "WARNING",
+            "drift_detected": True,
+        },
+        "feat_noise_3": {
+            "feature": "feat_noise_3",
+            "status": "EVALUATED",
+            "ks_statistic": 0.16,
+            "p_value": 0.045,
+            "psi": 0.01,
+            "severity": "WARNING",
+            "drift_detected": True,
+        },
+        "feat_clean": {
+            "feature": "feat_clean",
+            "status": "EVALUATED",
+            "ks_statistic": 0.05,
+            "p_value": 0.650,
+            "psi": 0.01,
+            "severity": "NORMAL",
+            "drift_detected": False,
+        },
+    }
+
+    corrected = apply_benjamini_hochberg(raw_results, q_level=0.05)
+
+    # Culprit feature should be declared an FDR discovery
+    assert corrected["feat_culprit"]["fdr_significant"] is True
+    assert corrected["feat_culprit"]["drift_detected"] is True
+    assert corrected["feat_culprit"]["fdr_rank"] == 1
+
+    # Borderline noisy features should be REJECTED (false alarms prevented)
+    # because for rank 2: critical val = (2/5)*0.05 = 0.02, but raw p=0.040 > 0.02
+    assert corrected["feat_noise_1"]["fdr_significant"] is False
+    assert corrected["feat_noise_1"]["drift_detected"] is False
+    assert corrected["feat_noise_1"]["severity"] == "NORMAL"
+
+    assert corrected["feat_noise_2"]["fdr_significant"] is False
+    assert corrected["feat_noise_2"]["drift_detected"] is False
+
+    assert corrected["feat_noise_3"]["fdr_significant"] is False
+    assert corrected["feat_noise_3"]["drift_detected"] is False
+

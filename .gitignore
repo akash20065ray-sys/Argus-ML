@@ -26,3 +26,28 @@ Thumbs.db
 *.pdf
 *.zip
 
+# Temporary scratch & inspection artifacts
+scratch/
+docs/pdf_preview/
+docs/ieee_template/
+docs/ieee_template_repo/
+docs/figures/crimson_sample.jpg
+docs/*Audit_Report.html
+docs/*Winnowing_Report.html
+tools/dump_crimson*.py
+tools/inspect_crimson*.py
+tools/compare_structure.py
+tools/compile_texlive.py
+tools/ieee_paper_writing_skill/
+tools/lmscan/
+tools/plagiarism_checker/
+tools/apply_*.py
+tools/humanize_*.py
+tools/inspect_*.py
+tools/loop_*.py
+tools/update_*.py
+tools/enhance_*.py
+data/
+
+
+

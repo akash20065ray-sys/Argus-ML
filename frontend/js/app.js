@@ -192,12 +192,14 @@ function updateModelCatalog(models, activeMeta) {
   const emptyHero = document.getElementById('empty-state-hero');
   const btnUnload = document.getElementById('btn-unload-model');
   const btnStripUnload = document.getElementById('btn-strip-unload');
+  const btnExportCsv = document.getElementById('btn-export-csv');
 
   if (!activeMeta) {
     // Clean workspace state: No model is currently active
     if (emptyHero) emptyHero.style.display = 'block';
     if (btnUnload) btnUnload.style.display = 'none';
     if (btnStripUnload) btnStripUnload.style.display = 'none';
+    if (btnExportCsv) btnExportCsv.style.display = 'none';
 
     if (select) {
       let optionsHtml = '<option value="">(No Model Active - Standby)</option>';
@@ -262,6 +264,7 @@ function updateModelCatalog(models, activeMeta) {
   if (emptyHero) emptyHero.style.display = 'none';
   if (btnUnload) btnUnload.style.display = 'inline-block';
   if (btnStripUnload) btnStripUnload.style.display = 'inline-block';
+  if (btnExportCsv) btnExportCsv.style.display = 'inline-block';
 
   const controlStrip = document.querySelector('.control-strip');
   if (controlStrip) {
@@ -836,9 +839,14 @@ async function triggerAutoRetrain() {
     }
 
     if (data.gate_status === 'PASS') {
+      const btnDownloadDataset = document.getElementById('btn-rca-download-dataset');
+      if (btnDownloadDataset) {
+        btnDownloadDataset.style.display = 'inline-block';
+        btnDownloadDataset.innerHTML = `📥 Download Retrained Dataset (${data.new_version || 'v1.1.0'}.csv)`;
+      }
       showToast(
         'Validation Gate Passed',
-        `Candidate promoted to ${data.new_version}. Baseline distributions refreshed.`,
+        `Candidate promoted to ${data.new_version}. Dataset fused (${data.samples_trained || ''} rows). Baselines refreshed.`,
         'success'
       );
     } else {
@@ -895,6 +903,20 @@ async function downloadPostMortemReport() {
     console.error('Error generating post-mortem report:', err);
     showToast('Export Error', 'Failed to download report markdown.', 'error');
   }
+}
+
+/**
+ * Phase 10: Export Fused Retrained / Baseline Dataset (.csv)
+ */
+function exportActiveDataset() {
+  if (!activeModelMeta || !activeModelMeta.model_id) {
+    showToast('No Active Model', 'Please select or register a model first.', 'warning');
+    return;
+  }
+  const modelId = activeModelMeta.model_id;
+  const version = activeModelMeta.version || 'v1.0.0';
+  showToast('Exporting Dataset', `Generating CSV with provenance audit tags for ${modelId} (${version})...`, 'info');
+  window.location.href = `${API_BASE}/api/models/${modelId}/export-dataset`;
 }
 
 /**
@@ -1055,18 +1077,18 @@ function renderHistoryList() {
       return `
       <div class="history-card ${cardClass}" onclick="openSnapshotById('${rec.session_id}')">
         <div class="history-card-header">
-          <div>
-            <div class="history-model-name">${rec.model_name || rec.model_id}</div>
+          <div class="history-card-title-col">
+            <div class="history-model-name" title="${rec.model_name || rec.model_id}">${rec.model_name || rec.model_id}</div>
             <span class="history-timestamp">${rec.formatted_time || 'Recent'}</span>
           </div>
-          <span class="alert-badge ${badgeClass}" style="font-size: 0.68rem; padding: 2px 6px;">
+          <span class="alert-badge ${badgeClass}">
             ${badgeText}
           </span>
         </div>
         <div class="history-card-summary">${rec.summary || 'Test session recorded.'}</div>
         ${kpisHtml ? `<div class="history-card-kpis">${kpisHtml}</div>` : ''}
         <div class="history-card-footer">
-          <span style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-dim);">ID: ${rec.session_id.split('_').slice(0, 2).join('_')}</span>
+          <span class="history-session-tag" title="${rec.session_id}">ID: ${rec.session_id.split('_').slice(0, 2).join('_')}</span>
           <span class="history-inspect-hint">Inspect Snapshot &rarr;</span>
         </div>
       </div>

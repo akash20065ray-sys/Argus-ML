@@ -287,6 +287,30 @@ def retrain_model_endpoint(model_id: str):
         raise HTTPException(status_code=400, detail=f"Retraining failed: {str(e)}")
 
 
+@app.get("/api/models/{model_id}/export-dataset")
+def export_model_dataset(model_id: str):
+    """
+    Exports the training dataset of the specified model (including baseline and fused sliding window telemetry)
+    as a downloadable CSV with an auditable `_provenance` column ('baseline' vs 'live_sliding_window').
+    """
+    if model_id not in system.models_map:
+        raise HTTPException(status_code=404, detail="Model not found")
+
+    model = system.models_map[model_id]
+    csv_content = model.export_csv(include_provenance=True)
+    meta = system.registry.get_model(model_id)
+    version = getattr(meta, "version", "v1.0.0") if meta else "v1.0.0"
+    filename = f"{model_id}_{version}_dataset.csv"
+
+    from fastapi.responses import Response
+
+    return Response(
+        content=csv_content,
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
 @app.get("/api/alerts/{alert_id}/report")
 def get_incident_report(alert_id: str):
     """

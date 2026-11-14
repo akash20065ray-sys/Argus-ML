@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/style.css?v=2.2">
+  <link rel="stylesheet" href="/static/css/style.css?v=3.5">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
 </head>
 <body>
@@ -82,6 +82,10 @@
 
       <button id="btn-reset" class="sim-btn reset-btn" onclick="resetTelemetry()">
         Reset Baseline
+      </button>
+
+      <button id="btn-export-csv" class="sim-btn" style="color: var(--accent-emerald); border-color: rgba(16, 185, 129, 0.35); display: none;" onclick="exportActiveDataset()" title="Download current model training and streaming dataset as CSV with provenance metadata">
+        📥 Export Dataset (.csv)
       </button>
 
       <button id="btn-strip-unload" class="sim-btn" style="color: var(--text-muted); border-color: rgba(255,255,255,0.12); display: none;" onclick="unloadActiveModel()" title="Unload active model and return to standby">
@@ -454,6 +458,9 @@
         <button type="button" id="btn-rca-download-report" class="sim-btn" style="color: var(--accent-cyan); border-color: rgba(56, 189, 248, 0.3); cursor: pointer;">
           Download Incident Report (.md)
         </button>
+        <button type="button" id="btn-rca-download-dataset" class="sim-btn" style="display: none; color: var(--accent-emerald); border-color: rgba(16, 185, 129, 0.4); cursor: pointer;" onclick="exportActiveDataset()">
+          📥 Download Retrained Dataset (.csv)
+        </button>
         <button type="button" id="btn-rca-auto-retrain" class="submit-btn" style="width: auto; padding: 8px 18px; cursor: pointer;">
           Auto-Retrain Model
         </button>
@@ -473,11 +480,11 @@
             Chronological log of model drift tests &amp; diagnoses
           </div>
         </div>
-        <div style="display: flex; gap: 8px; align-items: center;">
-          <button id="btn-clear-history" class="sim-btn" style="padding: 4px 10px; font-size: 0.72rem; color: var(--text-dim);" title="Clear history">
+        <div class="drawer-header-actions">
+          <button id="btn-clear-history" class="history-clear-btn" title="Clear history">
             Clear
           </button>
-          <button id="btn-close-history" class="close-btn" style="line-height: 1;">&times;</button>
+          <button id="btn-close-history" class="drawer-close-btn" title="Close drawer">&times;</button>
         </div>
       </div>
 
@@ -501,14 +508,14 @@
     <div class="snapshot-modal">
       <button id="snapshot-modal-close" class="close-btn">&times;</button>
 
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
-        <div>
-          <h2 style="font-size: 1.25rem; font-weight: 700;">Historical Test Snapshot</h2>
-          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-            Captured at <span id="snap-timestamp" style="color: #fff; font-family: var(--font-mono); font-weight: 600;">-</span> &bull; Session: <code id="snap-session-id" style="color: var(--accent-cyan);">-</code>
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; padding-right: 44px; gap: 12px;">
+        <div style="flex: 1; min-width: 0;">
+          <h2 style="font-size: 1.25rem; font-weight: 700; font-family: var(--font-display); color: #fff;">Historical Test Snapshot</h2>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; word-break: break-all;">
+            Captured at <span id="snap-timestamp" style="color: #fff; font-family: var(--font-mono); font-weight: 600;">-</span> &bull; Session: <code id="snap-session-id" style="color: var(--accent-cyan); font-family: var(--font-mono);">-</code>
           </div>
         </div>
-        <span id="snap-event-badge" class="alert-badge badge-critical">DRIFT DETECTED</span>
+        <span id="snap-event-badge" class="alert-badge badge-critical" style="flex-shrink: 0; white-space: nowrap;">DRIFT DETECTED</span>
       </div>
 
       <div style="display: flex; gap: 14px; margin-top: 10px; font-size: 0.82rem; color: var(--text-muted); flex-wrap: wrap;">
@@ -539,11 +546,11 @@
           </div>
           <span id="snap-confidence-badge" class="alert-badge badge-critical" style="font-size: 0.72rem;">-</span>
         </div>
-        <div style="font-size: 1.05rem; font-family: var(--font-mono); font-weight: 700; color: #fff;">
+        <div style="font-size: 1.05rem; font-family: var(--font-mono); font-weight: 700; color: #fff; word-break: break-word;">
           Culprit: <span id="snap-culprit-feature" style="color: var(--accent-crimson);">-</span>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-family: var(--font-mono); font-size: 0.76rem; margin-top: 8px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap: 8px; font-family: var(--font-mono); font-size: 0.76rem; margin-top: 8px;">
           <div style="background: rgba(0,0,0,0.35); padding: 6px 8px; border-radius: 5px;">
             <div style="color: var(--text-dim); font-size: 0.65rem;">ACCURACY</div>
             <div id="snap-accuracy" style="font-weight: 700; color: #fff;">-</div>

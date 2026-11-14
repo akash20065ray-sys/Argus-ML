@@ -252,11 +252,11 @@ def build_pdf():
 
     # ================= PAGE 1: COLUMN 1 =================
     abstract_text = (
-        "<b><i>Abstract</i>—Production machine learning (ML) systems exhibit silent failure modes under non-stationary streaming distributions where covariate shift and concept drift degrade predictive utility without triggering infrastructure-level exceptions. Existing Application Performance Monitoring (APM) tools are oblivious to statistical drift, while contemporary MLOps profilers operate primarily as offline, batch utilities lacking causal topology awareness. This paper presents <i>ArgusML</i>, an ultra-lightweight in-memory observability platform engineered upon five foundational data structures: (i) a fixed-capacity Circular FIFO Buffer ($O(1)$), (ii) a Double-Ended Sliding Window achieving $O(1)$ amortized rolling evaluation across both classification ($\text{Accuracy}, F_1$) and regression ($R^2, \text{RMSE}$) metrics, (iii) an in-memory Hash Map providing constant-time baseline distribution retrieval, (iv) a Binary Max-Heap priority queue for logarithmic incident severity triage ($O(\log N)$), and (v) a 4-layer dynamic Directed Acyclic Graph (DAG). ArgusML combines two-sample Kolmogorov-Smirnov hypothesis testing ($O(N \log N)$) and Population Stability Index (PSI) quantile binning ($O(N + B)$) with graph-theoretic Reverse-BFS ($O(V + E)$) to isolate upstream culprit feature corruption and compute a multi-factor Root Cause Confidence Score (RCS). Furthermore, it incorporates a closed-loop 4-step validation gate for automated zero-downtime model retraining and version promotion ($v1.0.0 \to v1.1.0$). Empirical evaluation across classification and regression benchmarks demonstrates that ArgusML imposes less than $17.0\ \mu\text{s}$ synchronous in-line latency per prediction, achieves 100% precision in culprit feature attribution under controlled covariate injection, and successfully remediates degraded classification accuracy from 68.1% to 96.2% and regression $R^2$ from 0.52 to 0.95 in real time.</b>"
+        r"<b><i>Abstract</i>—Production machine learning (ML) systems exhibit silent failure modes under non-stationary streaming distributions where covariate shift and concept drift degrade predictive utility without triggering infrastructure-level exceptions. Existing Application Performance Monitoring (APM) tools are oblivious to statistical drift, while contemporary MLOps profilers operate primarily as offline, batch utilities lacking causal topology awareness. This paper presents <i>ArgusML</i>, an ultra-lightweight in-memory observability platform engineered upon five foundational data structures: (i) a fixed-capacity Circular FIFO Buffer ($O(1)$), (ii) a Double-Ended Sliding Window achieving $O(1)$ amortized rolling evaluation across both classification ($\text{Accuracy}, F_1$) and regression ($R^2, \text{RMSE}$) metrics, (iii) an in-memory Hash Map providing constant-time baseline distribution retrieval, (iv) a Binary Max-Heap priority queue for logarithmic incident severity triage ($O(\log N)$), and (v) a 4-layer dynamic Directed Acyclic Graph (DAG). ArgusML combines two-sample Kolmogorov-Smirnov hypothesis testing ($O(N \log N)$) and Population Stability Index (PSI) quantile binning ($O(N + B)$) with graph-theoretic Reverse-BFS ($O(V + E)$) to isolate upstream culprit feature corruption and compute a multi-factor Root Cause Confidence Score (RCS). Furthermore, it incorporates a closed-loop 4-step validation gate for automated zero-downtime model retraining and version promotion ($v1.0.0 \to v1.1.0$). Empirical evaluation across classification and regression benchmarks demonstrates that ArgusML imposes less than $17.0\ \mu\text{s}$ synchronous in-line latency per prediction, achieves 100% precision in culprit feature attribution under controlled covariate injection, and successfully remediates degraded classification accuracy from 68.1% to 96.2% and regression $R^2$ from 0.52 to 0.95 in real time.</b>"
     )
     story.append(Paragraph(abstract_text, style_abstract))
 
-    keywords_text = "<b><i>Keywords</i>—Machine Learning Observability, Covariate Shift, Concept Drift, Kolmogorov-Smirnov Test, Population Stability Index, Directed Acyclic Graph, Reverse-BFS, Binary Max-Heap, Automated Retraining, Regression Monitoring, MLOps.</b>"
+    keywords_text = r"<b><i>Keywords</i>—Machine Learning Observability, Covariate Shift, Concept Drift, Kolmogorov-Smirnov Test, Population Stability Index, Directed Acyclic Graph, Reverse-BFS, Binary Max-Heap, Automated Retraining, Regression Monitoring, MLOps.</b>"
     story.append(Paragraph(keywords_text, style_body_noindent))
     story.append(Spacer(1, 4))
 
@@ -279,35 +279,35 @@ def build_pdf():
     # ================= PAGE 1: COLUMN 2 =================
     story.append(Paragraph("C. Technical Contributions of ArgusML", style_heading2))
     story.append(Paragraph("To bridge this critical architectural divide, this paper introduces <b>ArgusML</b>, an ultra-lightweight, in-memory observability platform built upon five foundational Data Structures and Algorithms (DSA). The primary contributions of this work are:", style_body))
-    story.append(Paragraph("<b>1) Zero-Dependency In-Memory DSA Core:</b> Implementation of five foundational data structures providing microsecond-level telemetry processing ($<17.0\ \mu\text{s}$ in-line overhead, $<0.45\text{ ms}$ background execution) without external messaging brokers or database dependencies.", style_body_noindent))
-    story.append(Paragraph("<b>2) Unified Dual-Paradigm Telemetry:</b> Support for rolling classification (Accuracy, Precision, Recall, $F_1$) and regression ($R^2$, MAE, RMSE, Variance Ratio) in $O(1)$ amortized sliding windows.", style_body_noindent))
-    story.append(Paragraph("<b>3) Streaming Statistical Drift Engine:</b> Real-time execution of the Two-Sample Kolmogorov-Smirnov (KS) test ($O(N \log N)$) and Population Stability Index (PSI) quantile binning ($O(N+B)$) against empirical baseline distributions stored in an $O(1)$ Hash Map.", style_body_noindent))
-    story.append(Paragraph("<b>4) Topological Root Cause Attribution via Reverse-BFS:</b> Dynamic 4-layer DAG modeling (<i>Pipelines $\to$ Features $\to$ Model $\to$ Downstream Services</i>) executing Reverse-BFS in $O(V+E)$ time to isolate the upstream corrupted feature and compute a multi-factor Root Cause Confidence Score (RCS).", style_body_noindent))
-    story.append(Paragraph("<b>5) Automated Incident Triage & Closed-Loop Self-Healing:</b> A custom array-backed Binary Max-Heap managing composite incident severity in $O(\log N)$ time, integrated with a 4-step validation gate for automated zero-downtime model retraining and promotion ($v1.0.0 \to v1.1.0$).", style_body_noindent))
+    story.append(Paragraph(r"<b>1) Zero-Dependency In-Memory DSA Core:</b> Implementation of five foundational data structures providing microsecond-level telemetry processing ($<17.0\ \mu\text{s}$ in-line overhead, $<0.45\text{ ms}$ background execution) without external messaging brokers or database dependencies.", style_body_noindent))
+    story.append(Paragraph(r"<b>2) Unified Dual-Paradigm Telemetry:</b> Support for rolling classification (Accuracy, Precision, Recall, $F_1$) and regression ($R^2$, MAE, RMSE, Variance Ratio) in $O(1)$ amortized sliding windows.", style_body_noindent))
+    story.append(Paragraph(r"<b>3) Streaming Statistical Drift Engine:</b> Real-time execution of the Two-Sample Kolmogorov-Smirnov (KS) test ($O(N \log N)$) and Population Stability Index (PSI) quantile binning ($O(N+B)$) against empirical baseline distributions stored in an $O(1)$ Hash Map.", style_body_noindent))
+    story.append(Paragraph(r"<b>4) Topological Root Cause Attribution via Reverse-BFS:</b> Dynamic 4-layer DAG modeling (<i>Pipelines $\to$ Features $\to$ Model $\to$ Downstream Services</i>) executing Reverse-BFS in $O(V+E)$ time to isolate the upstream corrupted feature and compute a multi-factor Root Cause Confidence Score (RCS).", style_body_noindent))
+    story.append(Paragraph(r"<b>5) Automated Incident Triage & Closed-Loop Self-Healing:</b> A custom array-backed Binary Max-Heap managing composite incident severity in $O(\log N)$ time, integrated with a 4-step validation gate for automated zero-downtime model retraining and promotion ($v1.0.0 \to v1.1.0$).", style_body_noindent))
 
     story.append(Paragraph("II. THEORETICAL FOUNDATIONS & RELATED WORK", style_heading1))
     story.append(Paragraph("A. Taxonomy of Non-Stationary Distribution Shift", style_heading2))
-    story.append(Paragraph("In non-stationary streaming environments, the joint probability distribution $P(X, Y)$ of input feature space $X \in \mathbb{R}^d$ and target label space $Y \in \mathcal{Y}$ varies across time $t$ [7], [8]. By Bayes' theorem, the joint distribution is decomposed as:", style_body))
+    story.append(Paragraph(r"In non-stationary streaming environments, the joint probability distribution $P(X, Y)$ of input feature space $X \in \mathbb{R}^d$ and target label space $Y \in \mathcal{Y}$ varies across time $t$ [7], [8]. By Bayes' theorem, the joint distribution is decomposed as:", style_body))
     story.append(Paragraph("<i>P(X, Y) = P(X) · P(Y | X) = P(Y) · P(X | Y) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(1)</i>", style_equation))
-    story.append(Paragraph("• <b>Covariate Shift (Feature Drift):</b> The marginal input distribution shifts while conditional class probabilities remain invariant [8], [9]:<br/><i>P<sub>t</sub>(X) ≠ P<sub>baseline</sub>(X) &nbsp; while &nbsp; P<sub>t</sub>(Y | X) = P<sub>baseline</sub>(Y | X) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(2)</i>", style_body_noindent))
-    story.append(Paragraph("• <b>Concept Drift:</b> The posterior conditional probability distribution shifts over time [10]:<br/><i>P<sub>t</sub>(Y | X) ≠ P<sub>baseline</sub>(Y | X) &nbsp; while &nbsp; P<sub>t</sub>(X) = P<sub>baseline</sub>(X) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(3)</i>", style_body_noindent))
+    story.append(Paragraph(r"• <b>Covariate Shift (Feature Drift):</b> The marginal input distribution shifts while conditional class probabilities remain invariant [8], [9]:<br/><i>P<sub>t</sub>(X) ≠ P<sub>baseline</sub>(X) &nbsp; while &nbsp; P<sub>t</sub>(Y | X) = P<sub>baseline</sub>(Y | X) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(2)</i>", style_body_noindent))
+    story.append(Paragraph(r"• <b>Concept Drift:</b> The posterior conditional probability distribution shifts over time [10]:<br/><i>P<sub>t</sub>(Y | X) ≠ P<sub>baseline</sub>(Y | X) &nbsp; while &nbsp; P<sub>t</sub>(X) = P<sub>baseline</sub>(X) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(3)</i>", style_body_noindent))
     story.append(Paragraph("• <b>Upstream Pipeline Corruption:</b> Schelter et al. [11] observed that data pipeline modifications (e.g., unit conversions, missing default fills) corrupt input features without altering schema types or throwing runtime exceptions.", style_body_noindent))
 
     # ================= PAGE 2 =================
     story.append(Paragraph("B. Statistical Distance Metrics & Hypothesis Testing", style_heading2))
-    story.append(Paragraph("<b>1) Two-Sample Kolmogorov-Smirnov Test [12]:</b> Quantifies maximum supremum divergence between empirical cumulative distribution functions $F_{\text{base}}(x)$ and $F_{\text{live}}(x)$ (Fig. 1(a)):", style_body_noindent))
+    story.append(Paragraph("<b>1) Two-Sample Kolmogorov-Smirnov Test [12]:</b> Quantifies maximum supremum divergence between empirical cumulative distribution functions $F_{\text{base}}(x)$ and $F_{\text{live}}(x)$ (Fig. 2(a)):", style_body_noindent))
     story.append(Paragraph("<i>D<sub>n, m</sub> = sup<sub>x ∈ ℝ</sub> | F<sub>base</sub>(x) - F<sub>live</sub>(x) | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(4)</i>", style_equation))
-    story.append(Paragraph("Under the null hypothesis $H_0: F_{\text{base}} = F_{\text{live}}$, the asymptotic Kolmogorov distribution yields the $p$-value. If $p < 0.05$, $H_0$ is rejected in $O(N \log N)$ time.", style_body))
+    story.append(Paragraph(r"Under the null hypothesis $H_0: F_{\text{base}} = F_{\text{live}}$, the asymptotic Kolmogorov distribution yields the $p$-value. If $p < 0.05$, $H_0$ is rejected in $O(N \log N)$ time.", style_body))
 
-    story.append(Paragraph("<b>2) Population Stability Index (PSI) [13]:</b> Discretizes baseline distributions into $B = 10$ quantile bins (Fig. 1(b)):", style_body_noindent))
+    story.append(Paragraph("<b>2) Population Stability Index (PSI) [13]:</b> Discretizes baseline distributions into $B = 10$ quantile bins (Fig. 2(b)):", style_body_noindent))
     story.append(Paragraph("<i>PSI = ∑<sub>b=1</sub><sup>B</sup> (A<sub>b</sub> - E<sub>b</sub>) · ln((A<sub>b</sub> + ε) / (E<sub>b</sub> + ε)) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(5)</i>", style_equation))
-    story.append(Paragraph("Standard thresholds: $\text{PSI} < 0.10$ (stable), $0.10 \le \text{PSI} < 0.25$ (moderate), $\text{PSI} \ge 0.25$ (critical shift) in $O(N+B)$ time.", style_body))
+    story.append(Paragraph("Standard thresholds: $\\text{PSI} < 0.10$ (stable), $0.10 \\le \\text{PSI} < 0.25$ (moderate), $\\text{PSI} \\ge 0.25$ (critical shift) in $O(N+B)$ time.", style_body))
 
-    # Embed Figure 1
+    # Embed Figure 2 (KS & PSI)
     fig1_path = os.path.join(FIG_DIR, 'fig1_ks_psi_drift_cdf.png')
     if os.path.exists(fig1_path):
         story.append(Image(fig1_path, width=col_width, height=col_width * 0.42))
-        story.append(Paragraph("<b>Fig. 1.</b> Non-Parametric Statistical Drift Detection in ArgusML: (a) Two-Sample Kolmogorov-Smirnov ECDF supremum divergence ($D = 0.431, p < 0.001$), and (b) Population Stability Index (PSI) 10-bin quantile shift ($\text{PSI} = 0.324 \ge 0.25$, critical drift).", style_caption))
+        story.append(Paragraph("<b>Fig. 2.</b> Non-Parametric Statistical Drift Detection in ArgusML: (a) Two-Sample Kolmogorov-Smirnov ECDF supremum divergence ($D = 0.431, p < 0.001$), and (b) Population Stability Index (PSI) 10-bin quantile shift ($\text{PSI} = 0.324 \\ge 0.25$, critical drift).", style_caption))
 
     story.append(Paragraph("C. Comparative Analysis with Existing Architectures", style_heading2))
     story.append(Paragraph("Table I contrasts ArgusML against representative enterprise APMs and open-source MLOps platforms across ten architectural dimensions.", style_body))
@@ -352,7 +352,7 @@ def build_pdf():
     fig0_path = os.path.join(FIG_DIR, 'fig0_system_architecture.png')
     if os.path.exists(fig0_path):
         story.append(Image(fig0_path, width=col_width, height=col_width * 0.56))
-        story.append(Paragraph("<b>Fig. 1.</b> End-to-End ArgusML System Architecture & 5-DSA Spine: (1) Circular FIFO Ingestion Buffer ($O(1)$), (2) Metric Sliding Window Deque ($O(1)$), (3) HashMap Registry & KS/PSI Drift Engine ($O(1)$/$O(W \\log W)$), (4) Dynamic 4-Layer DAG Reverse-BFS RCA ($O(V+E)$), and (5) Priority Max-Heap & 4-Step Retraining Gate ($O(\\log N)$).", style_caption))
+        story.append(Paragraph("<b>Fig. 1.</b> End-to-End ArgusML System Architecture & 5-DSA Spine: (1) Circular FIFO Ingestion Buffer ($O(1)$), (2) Metric Sliding Window Deque ($O(1)$), (3) HashMap Registry & KS/PSI Drift Engine ($O(1)$ / $O(W \\log W)$), (4) Dynamic 4-Layer DAG Reverse-BFS RCA ($O(V+E)$), and (5) Priority Max-Heap & 4-Step Retraining Gate ($O(\\log N)$).", style_caption))
 
     story.append(Paragraph("<b>1) Layer 1 (Ingestion Buffer):</b> Circular FIFO <code>EventQueue</code> with modulo pointer arithmetic ($C = 5000$) that decouples synchronous live prediction requests from background analytical processing.", style_body_noindent))
     story.append(Paragraph("<b>2) Layer 2 (Rolling Telemetry Window):</b> Double-ended <code>MetricSlidingWindow</code> ($W = 400$) maintaining running confusion matrix and residual variance accumulators for real-time classification and regression monitoring.", style_body_noindent))
@@ -370,7 +370,7 @@ def build_pdf():
     story.append(Paragraph("<i>TP ← TP - 𝕀(E<sub>old</sub>.gt=1 ∧ E<sub>old</sub>.pred=1) + 𝕀(E<sub>new</sub>.gt=1 ∧ E<sub>new</sub>.pred=1) &nbsp;&nbsp;&nbsp;&nbsp;(7)</i>", style_equation))
     story.append(Paragraph("<i>Accuracy<sub>t</sub> = (TP + TN) / (TP + FP + TN + FN) &nbsp;⇒&nbsp; O(1) amortized &nbsp;&nbsp;&nbsp;&nbsp;(8)</i>", style_equation))
 
-    story.append(Paragraph("For <b>Regression Models</b>, <code>MetricSlidingWindow</code> maintains running accumulators for sample count $W$, sum of actuals $\sum y_i$, sum of squared actuals $\sum y_i^2$, sum of residuals $\sum (y_i - \hat{y}_i)$, and sum of squared residuals $\text{SSR} = \sum (y_i - \hat{y}_i)^2$:", style_body))
+    story.append(Paragraph(r"For <b>Regression Models</b>, <code>MetricSlidingWindow</code> maintains running accumulators for sample count $W$, sum of actuals $\sum y_i$, sum of squared actuals $\sum y_i^2$, sum of residuals $\sum (y_i - \hat{y}_i)$, and sum of squared residuals $\text{SSR} = \sum (y_i - \hat{y}_i)^2$:", style_body))
     story.append(Paragraph("<i>MAE<sub>t</sub> = (1/W) ∑ |y<sub>i</sub> - ŷ<sub>i</sub>|, &nbsp;&nbsp; RMSE<sub>t</sub> = √[(1/W) ∑ (y<sub>i</sub> - ŷ<sub>i</sub>)<sup>2</sup>] &nbsp;&nbsp;&nbsp;&nbsp;(9)</i>", style_equation))
     story.append(Paragraph("<i>R<sup>2</sup><sub>t</sub> = 1 - [∑ (y<sub>i</sub> - ŷ<sub>i</sub>)<sup>2</sup> / ∑ (y<sub>i</sub> - ȳ)<sup>2</sup>] &nbsp;⇒&nbsp; O(1) amortized &nbsp;&nbsp;&nbsp;&nbsp;(10)</i>", style_equation))
 
@@ -417,20 +417,20 @@ def build_pdf():
     story.append(Paragraph("D. Binary Max-Heap Incident Prioritization", style_heading2))
     story.append(Paragraph("To protect on-call engineers from alert fatigue, <code>AlertMaxHeap</code> prioritizes incidents using custom <code>_sift_up</code> and <code>_sift_down</code> operations:", style_body))
     story.append(Paragraph("<i>Priority(𝒜) = (40 · ΔAcc) + (40 · Drift<sub>mag</sub>) + (20 · BlastCount) &nbsp;&nbsp;&nbsp;&nbsp;(13)</i>", style_equation))
-    story.append(Paragraph("Push and pop-max operate in strict $O(\log N)$ time and $O(N)$ space.", style_body))
+    story.append(Paragraph(r"Push and pop-max operate in strict $O(\log N)$ time and $O(N)$ space.", style_body))
 
     story.append(Paragraph("E. Closed-Loop 4-Step Retraining Validation Gate", style_heading2))
-    story.append(Paragraph("The Closed-Loop Retraining Gate enforces a 4-step validation gate before promoting candidate model $\mathcal{M}_{\text{cand}}$:", style_body))
-    story.append(Paragraph("<b>1) Performance Gate:</b> $\text{Score}(\mathcal{M}_{\text{cand}}) \ge \text{SLA}_{\text{perf}}$ (Accuracy $\ge 85\%$ for classification; $R^2 \ge 0.80$ for regression).<br/>"
-                           "<b>2) Strict Outperformance Gate:</b> $\text{Score}(\mathcal{M}_{\text{cand}}) > \text{Score}(\mathcal{M}_{\text{active}}) - 0.02$.<br/>"
-                           "<b>3) Latency Gate:</b> Inference P99 Latency $\le 200\text{ ms}$.<br/>"
-                           "<b>4) Stability Check:</b> Metric score is finite, non-NaN, and variance is stable.", style_body_noindent))
+    story.append(Paragraph(r"The Closed-Loop Retraining Gate enforces a 4-step validation gate before promoting candidate model $\mathcal{M}_{\text{cand}}$:", style_body))
+    story.append(Paragraph(r"<b>1) Performance Gate:</b> $\text{Score}(\mathcal{M}_{\text{cand}}) \ge \text{SLA}_{\text{perf}}$ (Accuracy $\ge 85\%$ for classification; $R^2 \ge 0.80$ for regression).<br/>"
+                           r"<b>2) Strict Outperformance Gate:</b> $\text{Score}(\mathcal{M}_{\text{cand}}) > \text{Score}(\mathcal{M}_{\text{active}}) - 0.02$.<br/>"
+                           r"<b>3) Latency Gate:</b> Inference P99 Latency $\le 200\text{ ms}$.<br/>"
+                           r"<b>4) Stability Check:</b> Metric score is finite, non-NaN, and variance is stable.", style_body_noindent))
 
     # Embed Figure 4 (Latency)
     fig3_path = os.path.join(FIG_DIR, 'fig3_latency_breakdown_throughput.png')
     if os.path.exists(fig3_path):
         story.append(Image(fig3_path, width=col_width, height=col_width * 0.40))
-        story.append(Paragraph("<b>Fig. 4.</b> Microsecond Telemetry Performance: (a) Execution latency across DSA operations ($\mu\text{s}$, log scale), and (b) P50, P95, and P99 in-line latency scalability under increasing ingestion throughput up to 20,000 events/sec.", style_caption))
+        story.append(Paragraph(r"<b>Fig. 4.</b> Microsecond Telemetry Performance: (a) Execution latency across DSA operations ($\mu\text{s}$, log scale), and (b) P50, P95, and P99 in-line latency scalability under increasing ingestion throughput up to 20,000 events/sec.", style_caption))
 
     # ================= PAGE 5 =================
     story.append(Paragraph("V. COMPLEXITY ANALYSIS & THEORETICAL GUARANTEES", style_heading1))
@@ -461,11 +461,11 @@ def build_pdf():
     story.append(Paragraph("A. Experimental Setup", style_heading2))
     story.append(Paragraph("ArgusML was evaluated on an isolated benchmarking node (AMD Ryzen 7, 16 GB RAM, Python 3.13 runtime) across three production datasets:", style_body))
     story.append(Paragraph("<b>1) Telecom Churn ($N=7043, d=20$):</b> Binary classification tracking accuracy, precision, and recall under covariate shift injected into <code>monthly_charges</code>.", style_body_noindent))
-    story.append(Paragraph("<b>2) Credit Card Fraud ($N=10000, d=14$):</b> High-throughput fraud classification under extreme class imbalance ($98.5\% : 1.5\%$) with latency noise.", style_body_noindent))
+    story.append(Paragraph(r"<b>2) Credit Card Fraud ($N=10000, d=14$):</b> High-throughput fraud classification under extreme class imbalance ($98.5\% : 1.5\%$) with latency noise.", style_body_noindent))
     story.append(Paragraph("<b>3) Real Estate Property Valuation ($N=500, d=4$):</b> Continuous regression tracking MAE, RMSE, and $R^2$ score under covariate shift injected into <code>square_footage</code>.", style_body_noindent))
 
     story.append(Paragraph("B. Latency Overhead Benchmarks", style_heading2))
-    story.append(Paragraph("Table III and Fig. 3 summarize the microsecond latency profile across 10,000 continuous prediction requests.", style_body))
+    story.append(Paragraph("Table III and Fig. 4 summarize the microsecond latency profile across 10,000 continuous prediction requests.", style_body))
 
     table_iii_data = [
         [Paragraph("<b>Pipeline Stage</b>", style_table_head), Paragraph("<b>Mean (μs)</b>", style_table_head), Paragraph("<b>P95 (μs)</b>", style_table_head), Paragraph("<b>P99 (μs)</b>", style_table_head)],
@@ -511,7 +511,7 @@ def build_pdf():
 
     # ================= PAGE 6 =================
     story.append(Paragraph("D. Closed-Loop Retraining & Performance Recovery", style_heading2))
-    story.append(Paragraph("Table V and Fig. 4 document model performance across lifecycle transitions for both tasks.", style_body))
+    story.append(Paragraph("Table V and Fig. 5 document model performance across lifecycle transitions for both tasks.", style_body))
 
     table_v_data = [
         [Paragraph("<b>Task / Lifecycle</b>", style_table_head), Paragraph("<b>Version</b>", style_table_head), Paragraph("<b>Primary Metric</b>", style_table_head), Paragraph("<b>Error / Latency</b>", style_table_head), Paragraph("<b>Health</b>", style_table_head)],
@@ -540,15 +540,15 @@ def build_pdf():
     fig4_path = os.path.join(FIG_DIR, 'fig4_dual_recovery_curves.png')
     if os.path.exists(fig4_path):
         story.append(Image(fig4_path, width=col_width, height=col_width * 0.42))
-        story.append(Paragraph("<b>Fig. 5.</b> Dual-Paradigm Closed-Loop Retraining Recovery: (a) Classification accuracy and $F_1$ recovery ($68.1\% \to 96.2\%$), and (b) Regression $R^2$ and RMSE recovery ($R^2: 0.52 \to 0.95$, $\text{RMSE}: \$46.2\text{k} \to \$13.8\text{k}$).", style_caption))
+        story.append(Paragraph(r"<b>Fig. 5.</b> Dual-Paradigm Closed-Loop Retraining Recovery: (a) Classification accuracy and $F_1$ recovery ($68.1\% \to 96.2\%$), and (b) Regression $R^2$ and RMSE recovery ($R^2: 0.52 \to 0.95$, $\text{RMSE}: \$46.2\text{k} \to \$13.8\text{k}$).", style_caption))
 
     story.append(Paragraph("VII. DISCUSSION & PRACTICAL IMPLICATIONS", style_heading1))
     story.append(Paragraph("<b>1) Zero-Vendor Infrastructure Footprint:</b> Unlike distributed observability stacks requiring Kafka, Cassandra, or Redis clusters, ArgusML executes entirely in-process using native data structures, making it ideal for edge computing and microservices.", style_body_noindent))
     story.append(Paragraph("<b>2) Mitigating SRE Alert Fatigue:</b> By filtering alerts through binary max-heap composite severity scoring, ArgusML eliminates transient false alarms.", style_body_noindent))
-    story.append(Paragraph("<b>3) Defensive Complexity Positioning:</b> While model lookup and queue operations are strict $O(1)$, distribution comparisons over sliding windows are fundamentally bounded by sorting and binning complexities ($O(W \log W)$ and $O(W+B)$). Acknowledging these analytical bounds ensures academic rigor.", style_body_noindent))
+    story.append(Paragraph(r"<b>3) Defensive Complexity Positioning:</b> While model lookup and queue operations are strict $O(1)$, distribution comparisons over sliding windows are fundamentally bounded by sorting and binning complexities ($O(W \log W)$ and $O(W+B)$). Acknowledging these analytical bounds ensures academic rigor.", style_body_noindent))
 
     story.append(Paragraph("VIII. CONCLUSION & FUTURE WORK", style_heading1))
-    story.append(Paragraph("This paper presented <b>ArgusML</b>, an in-memory graph-powered observability and root-cause diagnostic platform for production machine learning systems. Built upon five foundational data structures, ArgusML delivers sub-millisecond telemetry ingestion ($<17.0\ \mu\text{s}$ in-line overhead), non-parametric statistical drift detection (KS-test and PSI), automated topological root cause attribution via Reverse-BFS ($O(V+E)$), logarithmic incident triage via Binary Max-Heap ($O(\log N)$), and closed-loop self-healing via a 4-step retraining gate across both classification and regression workloads. Empirical benchmarks confirm 100% attribution precision and seamless model recovery.", style_body))
+    story.append(Paragraph(r"This paper presented <b>ArgusML</b>, an in-memory graph-powered observability and root-cause diagnostic platform for production machine learning systems. Built upon five foundational data structures, ArgusML delivers sub-millisecond telemetry ingestion ($<17.0\ \mu\text{s}$ in-line overhead), non-parametric statistical drift detection (KS-test and PSI), automated topological root cause attribution via Reverse-BFS ($O(V+E)$), logarithmic incident triage via Binary Max-Heap ($O(\log N)$), and closed-loop self-healing via a 4-step retraining gate across both classification and regression workloads. Empirical benchmarks confirm 100% attribution precision and seamless model recovery.", style_body))
 
     story.append(Paragraph("ACKNOWLEDGMENT", style_heading1))
     story.append(Paragraph("The authors thank the Dept. of Computer Science and Engineering at Vishwakarma Institute of Technology, Pune, for technical guidance and infrastructure support.", style_body))

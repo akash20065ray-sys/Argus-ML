@@ -24,6 +24,7 @@ class UniversalModel:
         target_values: List[float],
         downstream_services: List[str],
         upstream_pipelines: List[str],
+        provenance: Optional[List[str]] = None,
     ):
         self.model_id = model_id
         self.name = name
@@ -34,6 +35,11 @@ class UniversalModel:
         self.target_values = target_values
         self.downstream_services = downstream_services
         self.upstream_pipelines = upstream_pipelines
+
+        if provenance is not None and len(provenance) == len(target_values):
+            self.provenance = list(provenance)
+        else:
+            self.provenance = ["baseline"] * len(target_values)
 
         # Train model
         X = np.column_stack([data_dict[f] for f in features])
@@ -63,6 +69,7 @@ class UniversalModel:
             combined_data[f] = list(base_arr) + list(new_arr)
 
         combined_targets = list(self.target_values) + list(new_target_values)
+        combined_provenance = list(self.provenance) + ["live_sliding_window"] * len(new_target_values)
 
         candidate = UniversalModel(
             model_id=self.model_id,
@@ -74,8 +81,36 @@ class UniversalModel:
             target_values=combined_targets,
             downstream_services=list(self.downstream_services),
             upstream_pipelines=list(self.upstream_pipelines),
+            provenance=combined_provenance,
         )
         return candidate
+
+    def export_csv(self, include_provenance: bool = True) -> str:
+        """
+        Exports the dataset (features + target + optional _provenance) as CSV string.
+        Enables auditable compliance, post-mortem inspections, and reproducible offline training.
+        """
+        import io
+        import csv
+
+        output = io.StringIO()
+        fieldnames = list(self.features) + [self.target_name]
+        if include_provenance:
+            fieldnames.append("_provenance")
+
+        writer = csv.writer(output)
+        writer.writerow(fieldnames)
+
+        n_rows = len(self.target_values)
+        for i in range(n_rows):
+            row = [self.data_dict[f][i] for f in self.features]
+            row.append(self.target_values[i])
+            if include_provenance:
+                prov = self.provenance[i] if i < len(self.provenance) else "live_sliding_window"
+                row.append(prov)
+            writer.writerow(row)
+
+        return output.getvalue()
 
     def evaluate_validation_gate(
         self,
