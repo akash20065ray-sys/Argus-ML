@@ -349,9 +349,46 @@
           </div>
         </div>
 
+        <!-- Sample Datasets Download & Quick-Fill Helpers -->
+        <div style="background: rgba(56, 189, 248, 0.06); border: 1px dashed rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 12px 14px; margin-top: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 0.8rem; font-weight: 600; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 0.05em;">
+              📥 Sample CSVs for Testing
+            </span>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Click to Auto-Fill form or Download file</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div style="background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 8px 10px;">
+              <div style="font-size: 0.82rem; font-weight: 600; color: #38bdf8; margin-bottom: 4px;">Classification (Churn)</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px;">Target: <code>churn</code> (0/1) &bull; 1,000 rows</div>
+              <div style="display: flex; gap: 6px;">
+                <button type="button" id="btn-autofill-class" class="sim-btn" style="flex: 1; padding: 3px 6px; font-size: 0.72rem; color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);">
+                  ⚡ Auto-Fill
+                </button>
+                <a href="/static/classification.csv" download="classification.csv" class="sim-btn" style="text-decoration: none; padding: 3px 6px; font-size: 0.72rem; color: #cbd5e1; border-color: rgba(255, 255, 255, 0.2); display: inline-flex; align-items: center;">
+                  📥 .CSV
+                </a>
+              </div>
+            </div>
+
+            <div style="background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 8px 10px;">
+              <div style="font-size: 0.82rem; font-weight: 600; color: #10b981; margin-bottom: 4px;">Regression (Housing)</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px;">Target: <code>price</code> ($) &bull; 1,000 rows</div>
+              <div style="display: flex; gap: 6px;">
+                <button type="button" id="btn-autofill-reg" class="sim-btn" style="flex: 1; padding: 3px 6px; font-size: 0.72rem; color: #10b981; border-color: rgba(16, 185, 129, 0.4);">
+                  ⚡ Auto-Fill
+                </button>
+                <a href="/static/regression.csv" download="regression.csv" class="sim-btn" style="text-decoration: none; padding: 3px 6px; font-size: 0.72rem; color: #cbd5e1; border-color: rgba(255, 255, 255, 0.2); display: inline-flex; align-items: center;">
+                  📥 .CSV
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
-          <button type="button" id="btn-load-sample" class="sim-btn" style="color: var(--accent-cyan); border-color: rgba(56, 189, 248, 0.3);">
-            Quick Fill with Diabetes Sample
+          <button type="button" id="btn-load-sample" class="sim-btn" style="color: var(--text-muted); border-color: rgba(255, 255, 255, 0.15); font-size: 0.75rem;">
+            Clinical Diabetes Sample
           </button>
           <button type="submit" class="submit-btn" style="width: auto; padding: 8px 22px;">
             Initialize Model &rarr;

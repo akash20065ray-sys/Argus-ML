@@ -139,6 +139,16 @@ document.addEventListener('DOMContentLoaded', () => {
     autoFillBtn.addEventListener('click', autoFillDiabetesSample);
   }
 
+  const autoFillClassBtn = document.getElementById('btn-autofill-class');
+  if (autoFillClassBtn) {
+    autoFillClassBtn.addEventListener('click', autoFillClassificationSample);
+  }
+
+  const autoFillRegBtn = document.getElementById('btn-autofill-reg');
+  if (autoFillRegBtn) {
+    autoFillRegBtn.addEventListener('click', autoFillRegressionSample);
+  }
+
   // Load Demo Showcase button
   const loadDemoBtn = document.getElementById('btn-load-demo-showcase');
   if (loadDemoBtn) {
@@ -743,6 +753,46 @@ function autoFillDiabetesSample() {
   const dataTransfer = new DataTransfer();
   dataTransfer.items.add(file);
   document.getElementById('reg-csv-file').files = dataTransfer.files;
+}
+
+async function autoFillClassificationSample() {
+  document.getElementById('reg-model-id').value = 'customer_churn_v1';
+  document.getElementById('reg-model-name').value = 'Customer Churn Classifier';
+  document.getElementById('reg-model-type').value = 'CLASSIFICATION';
+  document.getElementById('reg-target-col').value = 'churn';
+  document.getElementById('reg-upstream').value = 'CRM Ingestion ETL, Billing Stream';
+  document.getElementById('reg-downstream').value = 'Retention Gateway, Customer Success CRM, Executive Dashboard';
+
+  try {
+    const res = await fetch('/static/classification.csv');
+    const blob = await res.blob();
+    const file = new File([blob], 'classification.csv', { type: 'text/csv' });
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    document.getElementById('reg-csv-file').files = dt.files;
+  } catch (err) {
+    console.error('Failed to load sample csv', err);
+  }
+}
+
+async function autoFillRegressionSample() {
+  document.getElementById('reg-model-id').value = 'housing_prices_v1';
+  document.getElementById('reg-model-name').value = 'Real Estate Valuation Regressor';
+  document.getElementById('reg-model-type').value = 'REGRESSION';
+  document.getElementById('reg-target-col').value = 'price';
+  document.getElementById('reg-upstream').value = 'MLS Property Feed, County Assessor ETL';
+  document.getElementById('reg-downstream').value = 'Mortgage Valuation API, Realtor Portal, Risk Dashboard';
+
+  try {
+    const res = await fetch('/static/regression.csv');
+    const blob = await res.blob();
+    const file = new File([blob], 'regression.csv', { type: 'text/csv' });
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    document.getElementById('reg-csv-file').files = dt.files;
+  } catch (err) {
+    console.error('Failed to load sample csv', err);
+  }
 }
 
 async function handleRegisterModelSubmit(e) {
